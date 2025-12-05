@@ -6,24 +6,27 @@ pool:
 
 steps: 
   - task: UseDotNet@2
+    displayName: 'Install .NET SDK 9.0.x'
     inputs:
       packageType: 'sdk'
       version: '9.0.x'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Restore NuGet packages'
     inputs:
       command: 'restore'
       projects: '**/*.csproj'
       feedsToUse: 'select'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Build projects'
     inputs:
       command: 'build'
       projects: '**/*.csproj'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
     inputs:
       command: 'test'
-      projects: '**/*tests.csproj'
 
 
