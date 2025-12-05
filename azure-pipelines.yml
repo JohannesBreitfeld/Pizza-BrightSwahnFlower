@@ -1,5 +1,10 @@
 pr:
-- dev
+  branches:
+    include:
+      - dev
+
+trigger:
+  none
 
 pool:
   default
@@ -28,5 +33,6 @@ steps:
     displayName: 'Run unit tests'
     inputs:
       command: 'test'
-
-
+      projects: '**/*Tests.csproj'
+      publishTestResults: true
+      testRunTitle: '$(Build.DefinitionName) - $(Build.BuildId)'
