@@ -35,7 +35,7 @@ public class OutboxProcessorService : BackgroundService
             await Task.Delay(_pollingInterval, stoppingToken);
         }
 
-        _logger.LogInformation("Outbox Processor Service stopped");
+        _logger.LogDebug("Outbox Processor Service stopped");
     }
 
     private async Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken)
