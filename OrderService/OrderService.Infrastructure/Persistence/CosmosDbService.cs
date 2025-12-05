@@ -42,7 +42,7 @@ public class CosmosDbService
         var containerResponse = await _database.CreateContainerIfNotExistsAsync(
             id: _options.ContainerName,
             partitionKeyPath: "/orderId",
-            throughput: 100); 
+            throughput: 400); 
         _container = containerResponse.Container;
     }
 }
