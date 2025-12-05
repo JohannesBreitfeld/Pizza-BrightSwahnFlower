@@ -1,5 +1,7 @@
 pr:
-- dev
+  branches:
+    include:
+      - dev
 
 pool:
   default
