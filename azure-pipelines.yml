@@ -1,3 +1,6 @@
+name: 
+  PR-Validation-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
+
 pr:
   branches:
     include:
@@ -36,3 +39,16 @@ steps:
       projects: '**/*Tests.csproj'
       publishTestResults: true
       testRunTitle: '$(Build.DefinitionName) - $(Build.BuildId)'
+
+  - task: DockerCompose@1
+    displayName: 'Validate docker-compose syntax'
+    inputs:
+      dockerComposeFile: 'docker-compose.yml'
+      action: 'Run a Docker Compose command'
+      dockerComposeCommand: 'config'
+
+  - task: DockerCompose@1
+    displayName: 'Build Docker Compose'
+    inputs:
+      dockerComposeFile: 'docker-compose.yml'
+      action: 'Build services'
