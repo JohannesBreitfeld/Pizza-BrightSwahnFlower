@@ -39,7 +39,7 @@ steps:
       publishTestResults: true
       testRunTitle: '$(Build.DefinitionName) - $(Build.BuildId)'
 
-  - script: docker compose -f docker-compose.yml config
+  - script: docker-compose -f docker-compose.yml config
     displayName: 'Validate docker-compose syntax'
 
   - task: DockerCompose@1
