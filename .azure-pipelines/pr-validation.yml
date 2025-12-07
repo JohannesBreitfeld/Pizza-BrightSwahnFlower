@@ -42,8 +42,5 @@ steps:
   - script: docker compose -f docker-compose.yml config
     displayName: 'Validate docker-compose syntax'
 
-  - task: DockerCompose@1
+  - script: docker compose -f docker-compose.yml build --parallel
     displayName: 'Build Docker Compose services'
-    inputs:
-      dockerComposeFile: 'docker-compose.yml'
-      action: 'Build services'
