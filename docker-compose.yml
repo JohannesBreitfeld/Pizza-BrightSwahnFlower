@@ -1,0 +1,82 @@
+networks:
+  pizza-network:
+    driver: bridge
+
+volumes:
+  cosmosdb_data:
+  rabbitmq_data:
+
+services:
+  gateway:
+    build:
+      context: ./PizzaGateway/PizzaGateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "5005:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    depends_on:
+      - orderservice
+    restart: on-failure
+    networks:
+      - pizza-network
+
+  orderservice:
+    build:
+      context: ./OrderService
+      dockerfile: OrderService.Api/Dockerfile
+    container_name: orderservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - CosmosDb__HttpClientFactory=true
+    depends_on:
+      cosmosdb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - pizza-network
+
+  cosmosdb:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+    container_name: cosmosdb
+    ports:
+      - "8081:8081"
+      - "10251:10251"
+      - "10252:10252"
+      - "10253:10253"
+      - "10254:10254"
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=3
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+    volumes:
+      - cosmosdb_data:/data/db
+    networks:
+      - pizza-network
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8081/_explorer/emulator.pem"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - pizza-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+

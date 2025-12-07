@@ -5,11 +5,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
-    .AddOcelot("ocelot-configuration", builder.Environment);
+    .AddJsonFile("ocelot-configuration/ocelot.json", optional: false, reloadOnChange: true);
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddOcelot(builder.Configuration);
+builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
 var app = builder.Build();
+
+app.UseSwaggerForOcelotUI(opt => {
+    opt.PathToSwaggerGenerator = "/swagger/docs";
+});
 
 await app.UseOcelot();
 
