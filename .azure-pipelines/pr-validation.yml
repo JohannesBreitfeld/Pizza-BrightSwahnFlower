@@ -1,0 +1,53 @@
+name: PR-Validation-$(Build.SourceBranchName)-$(Date:yyyyMMdd)$(Rev:.r)
+
+pr:
+  branches:
+    include:
+      - dev
+
+trigger:
+  none
+
+pool:
+  default
+
+steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK 9.0.x'
+    inputs:
+      packageType: 'sdk'
+      version: '9.0.x'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore NuGet packages'
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+      feedsToUse: 'select'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build projects'
+    inputs:
+      command: 'build'
+      projects: '**/*.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
+    inputs:
+      command: 'test'
+      projects: '**/*Tests.csproj'
+      publishTestResults: true
+      testRunTitle: '$(Build.DefinitionName) - $(Build.BuildId)'
+
+  - task: DockerCompose@1
+    displayName: 'Validate docker-compose syntax'
+    inputs:
+      dockerComposeFile: 'docker-compose.yml'
+      action: 'Run a docker compose command'
+      dockerComposeCommand: 'config'
+
+  - task: DockerCompose@1
+    displayName: 'Build Docker Compose services'
+    inputs:
+      dockerComposeFile: 'docker-compose.yml'
+      action: 'Build services'
