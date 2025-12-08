@@ -1,17 +1,30 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/orders",
+      "DownstreamPathTemplate": "/api/orders",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5001
+          "Host": "orderservice",
+          "Port": 8080
         }
       ],
-      "UpstreamPathTemplate": "/gateway/order",
+      "UpstreamPathTemplate": "/api/orders",
       "UpstreamHttpMethod": [
         "Post"
+      ],
+      "SwaggerKey": "orders"
+    }
+  ],
+  "SwaggerEndPoints": [
+    {
+      "Key": "orders",
+      "Config": [
+        {
+          "Name": "Order Service API",
+          "Version": "v1",
+          "Url": "http://orderservice:8080/openapi/v1.json"
+        }
       ]
     }
   ]
