@@ -1,0 +1,69 @@
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  dockerHubServiceConnection: 'dockerhub'
+  dockerHubUser: 'johannesbreitfeld'
+  imagePrefix: '$(dockerHubUser)/pizza'
+  tag: '$(Build.BuildId)'
+
+pool:
+  default
+
+steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK 9.0.x'
+    inputs:
+      packageType: 'sdk'
+      version: '9.0.x'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore NuGet packages'
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+      feedsToUse: 'select'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build projects'
+    inputs:
+      command: 'build'
+      projects: '**/*.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
+    inputs:
+      command: 'test'
+      projects: '**/*Tests.csproj'
+
+  - script: docker compose -f docker-compose.yml config
+    displayName: 'Validate docker-compose syntax'
+
+  - script: docker compose -f docker-compose.yml build --parallel
+    displayName: 'Build Docker Compose services'
+
+  - task: Docker@2
+    displayName: 'Docker Hub login'
+    inputs:
+      command: login
+      containerRegistry: $(dockerHubServiceConnection)
+
+  - script: |
+      services=$(docker compose config --services)
+
+      for svc in $services
+      do
+        img=$(docker images --format "{{.Repository}}" | grep "${svc}$")
+
+        docker tag $img $(imagePrefix)-$svc:latest
+        docker tag $img $(imagePrefix)-$svc:$(tag)
+      done
+
+      for svc in $services
+      do
+        docker push $(imagePrefix)-$svc:latest
+        docker push $(imagePrefix)-$svc:$(tag)
+      done
+    displayName: 'Tag and push Docker images to Docker Hub'
