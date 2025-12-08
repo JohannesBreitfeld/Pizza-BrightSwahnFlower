@@ -1,0 +1,153 @@
+﻿@page "/"
+@using PizzaFrontend.Components.Layout.Style
+@using PizzaFrontend.Contracts.Orders
+@using PizzaFrontend.Contracts.Pizzas
+@using System.Globalization
+@using PizzaFrontend.Interfaces
+@inject IInformationClient InformationApi
+@inject IOrderClient OrderApi
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+
+
+<PageTitle>Bright Swahn Flower Pizza</PageTitle>
+
+@if(_isLoading)
+{
+    <MudGrid Style="padding: 10px;">
+        @for (int i = 0; i < 3; i++)
+            {
+                <MudItem xs="4">
+                    <MudPaper Class="p-4">
+                        <MudSkeleton Variant="Rect" Height="300px" />
+                        <MudSkeleton Width="100%" />
+                        <MudSkeleton Width="100%" />
+                    </MudPaper>
+                </MudItem>
+             }
+    </MudGrid>
+} else 
+{
+    <MudGrid Style="padding: 10px;">
+        @foreach (var pizza in _pizzas)
+        {
+            <MudItem xs="4">
+                <MudCard>
+                    <div style=@($"height: 100%; width: 100%; background-color: {(pizza.IsSelected ? "#2A3520" : "#3A4A29")}")>
+                        <MudImage Src="@pizza.ImageUrl" Alt="@pizza.Name" Height="200" FallbackSrc="Images/pizza-not-found.png" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.h5">@pizza.Name</MudText>
+                            <MudText Typo="Typo.body2">@($"Toppings: {string.Join(", ", @pizza.Ingredients.Select(i => i.Name))}")</MudText>
+                            <MudText Typo="Typo.body2">@pizza.Price.ToString("C", CultureInfo.GetCultureInfo("sv-SE"))</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => SelectPizza(pizza)">
+                                Select
+                            </MudButton>
+                        </MudCardActions>
+                    </div>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+
+<MudAppBar Bottom="true" Fixed="true" Color="Color.Primary" Elevation="1">
+    <MudGrid Justify="Justify.SpaceAround">
+        <MudItem xs="6">
+            <MudTextField T="string" Label="Email" Variant="Variant.Outlined" @bind-Text="_email" Immediate="true">
+
+            </MudTextField>
+        </MudItem>
+        <MudItem xs="3">
+            <MudButton Disabled="_orderButtonIsDisabled" Style="margin-top: 15px;" Color="Color.Secondary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachMoney"
+            @onclick="() => PlaceOrderAsync()">Order</MudButton>
+        </MudItem>
+    </MudGrid>
+</MudAppBar>
+    
+
+    @code{
+    private Pizza? _selectedPizza;
+    private bool _isLoading = true;
+    private string _email = string.Empty;
+    private bool _orderButtonIsDisabled => _selectedPizza is null || string.IsNullOrEmpty(_email);
+    private List<Pizza> _pizzas = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                var pizzaDTOs = await InformationApi.GetPizzasAsync();
+
+                _pizzas = pizzaDTOs.Select(dto => new Pizza
+                {
+                    Id = dto.Id,
+                    Name = dto.Name,
+                    Price = dto.Price,
+                    Ingredients = dto.Ingredients.Select(i => new Ingredient
+                    {
+                        Id = i.Id,
+                        Name = i.Name
+                    }).ToList(),
+                    ImageUrl = dto.ImageUrl
+                }).ToList();
+            }
+            catch
+            {
+                Snackbar.Add("Couldn't retrieve pizzas, no connection to server", Severity.Error);
+            }
+
+            _isLoading = false;
+            StateHasChanged();  // required
+        }
+    }
+
+    private void SelectPizza(Pizza pizza)
+    {
+        Console.WriteLine("Hej");
+        if(_selectedPizza is not null)
+        {
+            _selectedPizza.IsSelected = false;
+        }
+
+        pizza.IsSelected = true;
+        _selectedPizza = pizza;
+        StateHasChanged();
+    }
+
+    private async Task PlaceOrderAsync()
+    {
+        var pizzas = new List<OrderItemDTO>() 
+        {
+            new OrderItemDTO(_selectedPizza!.Id.ToString(), _selectedPizza.Name, 1, _selectedPizza.Price)
+        };
+        var request = new CreateOrderRequest(_email, pizzas);
+
+        try
+        {
+            var result = await OrderApi.PlaceOrderAsync(request);
+
+            if(result.IsSuccessStatusCode)
+            {
+                var orderResponse = await result.Content.ReadFromJsonAsync<CreateOrderResponse>();
+
+                if(orderResponse is not null)
+                {
+                    Snackbar.Add($"Order {orderResponse.OrderId} successul");
+                }
+            } else
+            {
+                Snackbar.Add("Orrder failed", Severity.Error);
+            }
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add($"Order failed: {e.Message}", Severity.Error);
+        }
+
+    }
+}
