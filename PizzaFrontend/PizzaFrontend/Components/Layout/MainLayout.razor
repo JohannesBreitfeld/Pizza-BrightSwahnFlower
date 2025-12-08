@@ -1,0 +1,23 @@
+﻿@using PizzaFrontend.Components.Layout.Style
+@inherits LayoutComponentBase
+
+@* Required *@
+<MudThemeProvider Theme="@PizzaThemes.Default"/>
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+    <MudSnackbarProvider @rendermode="InteractiveServer" />
+
+<MudLayout>
+    <MudAppBar Elevation="0">
+        <MudText Class="appbar-title" Typo="Typo.h4">
+            Bright Swahn Flower Pizza
+        </MudText>
+    </MudAppBar>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
