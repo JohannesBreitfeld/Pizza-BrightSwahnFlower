@@ -1,4 +1,10 @@
-﻿namespace Identity.Core.Features;
+﻿using MediatR;
 
-public sealed record LoginCommand(string Email, string Password);
+namespace Identity.Core.Features;
+
+public sealed record LoginCommand : IRequest<LoginResponse>
+{
+    public string Username { get; init; } = string.Empty;
+    public string Password { get; init; } = string.Empty;
+}
 

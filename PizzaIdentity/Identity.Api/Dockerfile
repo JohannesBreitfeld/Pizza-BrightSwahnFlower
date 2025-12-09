@@ -12,6 +12,8 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Identity.Api/Identity.Api.csproj", "Identity.Api/"]
+COPY ["Identity.Core/Identity.Core.csproj", "Identity.Core/"]
+COPY ["Identity.Infrastructure/Identity.Infrastructure.csproj", "Identity.Infrastructure/"]
 RUN dotnet restore "./Identity.Api/Identity.Api.csproj"
 COPY . .
 WORKDIR "/src/Identity.Api"

@@ -11,6 +11,7 @@ public static class AuthEndpoints
         app.MapPost("api/auth/login", HandleLoginAsync)
             .WithName("Login")
             .WithTags("Auth")
+            .Produces<LoginResponse>(StatusCodes.Status200OK)
             .ProducesValidationProblem();
 
         return app;
