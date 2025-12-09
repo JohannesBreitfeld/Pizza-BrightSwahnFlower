@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Identity.Core.Contracts;
 using Identity.Core.Domain;
 using Identity.Core.Exceptions;
@@ -8,7 +5,6 @@ using Identity.Core.Features.Refresh;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 
 namespace Identity.Tests.Features.Refresh
 {
