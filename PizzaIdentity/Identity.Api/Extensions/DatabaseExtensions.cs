@@ -36,7 +36,6 @@ public static class DatabaseExtensions
         RoleManager<IdentityRole> roleManager,
         ILogger logger)
     {
-        // Seed roles
         var roles = new[] { "Admin", "User" };
         foreach (var roleName in roles)
         {
@@ -47,7 +46,6 @@ public static class DatabaseExtensions
             }
         }
 
-        // Seed default admin user
         var adminEmail = "admin@pizza.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
 

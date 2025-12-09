@@ -16,8 +16,11 @@ await app.InitializeDatabaseAsync();
 app.UseGlobalExceptionHandler();
 
 app.MapOpenApi();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/openapi/v1.json", "OrderService API V1");
+});
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
