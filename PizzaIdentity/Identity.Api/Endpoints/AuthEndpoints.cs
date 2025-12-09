@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Identity.Core.Features.Login;
+using Identity.Core.Features.Logout;
 using Identity.Core.Features.Refresh;
 using MediatR;
 
@@ -21,7 +22,23 @@ public static class AuthEndpoints
             .Produces<RefreshResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
+        app.MapPost("api/auth/logout", HandleLogoutAsync)
+            .WithName("Logout")
+            .WithTags("Auth")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesValidationProblem();
+
+
         return app;
+    }
+
+    private static async Task<IResult> HandleLogoutAsync(
+        LogoutCommand command,
+        IMediator mediator,
+        CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(command, cancellationToken);
+        return Results.Ok();
     }
 
     private static async Task<IResult> HandleRefreshAsync(
