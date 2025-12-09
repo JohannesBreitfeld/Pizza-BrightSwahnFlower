@@ -188,11 +188,11 @@ public class CreateOrderHandlerTests
 
         // Assert
         capturedOutbox.Should().NotBeNull();
-        capturedOutbox!.EventType.Should().Be("OrderCreated");
+        capturedOutbox!.EventType.Should().Be("Created");
         capturedOutbox.IsProcessed.Should().BeFalse();
         capturedOutbox.RetryCount.Should().Be(0);
         capturedOutbox.Payload.Should().NotBeNullOrEmpty();
-        capturedOutbox.Payload.Should().Contain("OrderCreated");
+        capturedOutbox.Payload.Should().Contain("Created");
         capturedOutbox.Payload.Should().Contain("test@example.com");
     }
 

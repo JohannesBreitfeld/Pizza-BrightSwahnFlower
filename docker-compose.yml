@@ -80,3 +80,22 @@ services:
       timeout: 5s
       retries: 5
 
+  emailservice:
+    build:
+      context: ./PizzaMail/PizzaMail
+      dockerfile: Dockerfile
+    container_name: emailservice
+    ports:
+      - "7071:80"
+    environment:
+      - FUNCTIONS_WORKER_RUNTIME=dotnet-isolated
+      - AzureWebJobsStorage=UseDevelopmentStorage=true
+      - RABBITMQ_CONNECTION=amqp://guest:guest@rabbitmq:5672/
+      - MAILERSEND_API_KEY=REDACTED_API_KEY
+      - MAILERSEND_FROM_EMAIL=pizza@test-zxk54v8vozpljy6v.mlsender.net
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - pizza-network
+
