@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Identity.Core.Features;
+namespace Identity.Core.Features.Login;
 
 public class LoginCommandValidator : AbstractValidator<LoginCommand>
 {

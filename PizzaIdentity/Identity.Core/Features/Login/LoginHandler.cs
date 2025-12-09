@@ -3,23 +3,27 @@ using Identity.Core.Domain;
 using Identity.Core.Exceptions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
-namespace Identity.Core.Features;
+namespace Identity.Core.Features.Login;
 
 public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly ILogger<LoginHandler> _logger;
 
     public LoginHandler(
         UserManager<IdentityUser> userManager,
         IRefreshTokenRepository refreshTokenRepository,
-        IJwtTokenService jwtTokenService)
+        IJwtTokenService jwtTokenService,
+        ILogger<LoginHandler> logger)
     {
         _userManager = userManager;
         _refreshTokenRepository = refreshTokenRepository;
         _jwtTokenService = jwtTokenService;
+        _logger = logger;
     }
 
     public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -27,6 +31,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
         var user = await _userManager.FindByNameAsync(request.Username);
         if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
         {
+            _logger.LogWarning("Invalid login attempt for user: {Username}", request.Username);
             throw new InvalidCredentialsException();
         }
 
@@ -47,6 +52,7 @@ public class LoginHandler : IRequestHandler<LoginCommand, LoginResponse>
 
         await _refreshTokenRepository.AddAsync(refreshToken);
 
+        _logger.LogInformation("User {Username} logged in successfully", request.Username);
         return new LoginResponse(jwtToken, refreshTokenString, expiresAt);
     }
 }

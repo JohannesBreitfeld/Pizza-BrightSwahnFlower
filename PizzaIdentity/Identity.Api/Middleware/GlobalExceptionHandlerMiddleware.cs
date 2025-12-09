@@ -43,6 +43,10 @@ public class GlobalExceptionHandlerMiddleware
                 statusCode = HttpStatusCode.BadRequest;
                 message = exception.Message;
                 break;
+            case InvalidRefreshTokenException:
+                statusCode = HttpStatusCode.BadRequest;
+                message = exception.Message;
+                break;
         }
 
         context.Response.ContentType = "application/json";

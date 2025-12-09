@@ -1,4 +1,4 @@
-﻿namespace Identity.Core.Features;
+﻿namespace Identity.Core.Features.Login;
 
 public sealed record LoginResponse(
     string Token, 

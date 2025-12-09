@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Identity.Core.Features;
+namespace Identity.Core.Features.Login;
 
 public sealed record LoginCommand : IRequest<LoginResponse>
 {

@@ -1,6 +1,7 @@
 using System.Text;
 using FluentValidation;
 using Identity.Core.Contracts;
+using Identity.Core.Features.Login;
 using Identity.Core.Services;
 using Identity.Infrastructure;
 using Identity.Infrastructure.Repositories;
@@ -76,9 +77,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddMediatR(cfg =>
-            cfg.RegisterServicesFromAssembly(typeof(Core.Features.LoginCommand).Assembly));
+            cfg.RegisterServicesFromAssembly(typeof(LoginCommand).Assembly));
 
-        services.AddValidatorsFromAssembly(typeof(Core.Features.LoginCommand).Assembly);
+        services.AddValidatorsFromAssembly(typeof(LoginCommand).Assembly);
 
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
