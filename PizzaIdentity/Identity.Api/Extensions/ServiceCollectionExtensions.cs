@@ -46,7 +46,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwtSettings = configuration.GetSection("JwtSettings");
+        var jwtSettings = configuration.GetSection("JwtSettings") ?? throw new InvalidOperationException("JWT Settings is not configured");
         var secretKey = jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT Secret is not configured");
 
         services.AddAuthentication(options =>
