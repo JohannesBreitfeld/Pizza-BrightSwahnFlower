@@ -9,6 +9,15 @@ namespace PizzaFrontend.Extensions
         {
             var baseUrl = configuration.GetValue<string>("GatewayUrl");
 
+            services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<AuthenticationStateService>();
+            services.AddTransient<AuthenticationDelegatingHandler>();
+
+            services.AddHttpClient<IAuthenticationClient, AuthenticationClient>(client =>
+            {
+                client.BaseAddress = new Uri($"{baseUrl}/api/identity");
+            });
+
             services.AddHttpClient<IInformationClient, InformationClient>(client =>
             {
                 client.BaseAddress = new Uri($"{baseUrl}/api/information");
@@ -18,6 +27,18 @@ namespace PizzaFrontend.Extensions
             {
                 client.BaseAddress = new Uri($"{baseUrl}/api/orders");
             });
+
+            services.AddHttpClient<IAdminPizzaClient, AdminPizzaClient>(client =>
+            {
+                client.BaseAddress = new Uri($"{baseUrl}/api/admin/information");
+            })
+            .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+
+            services.AddHttpClient<IAdminOrderClient, AdminOrderClient>(client =>
+            {
+                client.BaseAddress = new Uri($"{baseUrl}/api/admin/orders");
+            })
+            .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
 
             return services;
         }

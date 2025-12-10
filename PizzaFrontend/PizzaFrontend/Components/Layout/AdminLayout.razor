@@ -1,0 +1,127 @@
+@using PizzaFrontend.Components.Layout.Style
+@using PizzaFrontend.Services
+@using PizzaFrontend.Interfaces
+@inherits LayoutComponentBase
+@inject AuthenticationStateService AuthStateService
+@inject ITokenService TokenService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<MudThemeProvider Theme="@PizzaThemes.Default"/>
+<MudPopoverProvider />
+
+<MudDialogProvider />
+
+<MudSnackbarProvider @rendermode="InteractiveServer" />
+
+<MudLayout>
+    <MudAppBar Elevation="0">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudText Typo="Typo.h5" Class="ml-3">Admin Panel - Bright Swahn Flower Pizza</MudText>
+        <MudSpacer />
+        @if (!string.IsNullOrEmpty(_userEmail))
+        {
+            <MudText Typo="Typo.body1" Class="mr-4">@_userEmail</MudText>
+        }
+        <MudTooltip Text="Logout">
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="HandleLogout" />
+        </MudTooltip>
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1" ClipMode="DrawerClipMode.Always">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Navigation</MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/admin" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">
+                Dashboard
+            </MudNavLink>
+            <MudNavLink Href="/admin/pizzas" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LocalPizza">
+                Manage Pizzas
+            </MudNavLink>
+            <MudNavLink Href="/admin/orders" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.ShoppingCart">
+                View Orders
+            </MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+            @if (_isLoading)
+            {
+                <MudProgressCircular Indeterminate="true" />
+            }
+            else if (_isAuthorized)
+            {
+                @Body
+            }
+            else
+            {
+                <MudText>Redirecting to login...</MudText>
+            }
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _drawerOpen = true;
+    private bool _isLoading = true;
+    private bool _isAuthorized = false;
+    private string _userEmail = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckAuthorization();
+    }
+
+    private async Task CheckAuthorization()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            _isAuthorized = await AuthStateService.IsAuthenticatedAsync();
+
+            if (!_isAuthorized)
+            {
+                Navigation.NavigateTo("/login");
+                return;
+            }
+
+            var userInfo = await AuthStateService.GetCurrentUserAsync();
+            if (userInfo != null)
+            {
+                _userEmail = userInfo.Email;
+            }
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ToggleDrawer()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private async Task HandleLogout()
+    {
+        try
+        {
+            await TokenService.ClearTokensAsync();
+
+            AuthStateService.NotifyAuthenticationStateChanged();
+
+            Snackbar.Add("Logged out successfully", Severity.Info);
+
+            Navigation.NavigateTo("/login");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Logout error: {ex.Message}", Severity.Error);
+        }
+    }
+}

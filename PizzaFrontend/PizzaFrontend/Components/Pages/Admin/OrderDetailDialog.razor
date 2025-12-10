@@ -1,0 +1,104 @@
+@using PizzaFrontend.Contracts.Admin
+@using System.Globalization
+@using MudBlazor
+
+<MudDialog>
+    <DialogContent>
+        @if (Order != null)
+        {
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mb-2">Order Information</MudText>
+                    <MudDivider Class="mb-4" />
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Order ID</MudText>
+                    <MudText Typo="Typo.body1" Class="mb-3">@Order.OrderId</MudText>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Customer Email</MudText>
+                    <MudText Typo="Typo.body1" Class="mb-3">@Order.CustomerEmail</MudText>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Date</MudText>
+                    <MudText Typo="Typo.body1" Class="mb-3">@Order.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</MudText>
+                </MudItem>
+
+                <MudItem xs="12" sm="6">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">Status</MudText>
+                    <MudChip T="string" Size="Size.Small" Color="@GetStatusColor(Order.Status)" Class="mb-3">
+                        @Order.Status
+                    </MudChip>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6" Class="mt-4 mb-2">Order Items</MudText>
+                    <MudDivider Class="mb-4" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudTable Items="@Order.Items" Hover="true" Dense="true" Breakpoint="Breakpoint.Sm">
+                        <HeaderContent>
+                            <MudTh>Product</MudTh>
+                            <MudTh>Quantity</MudTh>
+                            <MudTh>Unit Price</MudTh>
+                            <MudTh>Subtotal</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Product">@context.ProductName</MudTd>
+                            <MudTd DataLabel="Quantity">@context.Quantity</MudTd>
+                            <MudTd DataLabel="Unit Price">@context.UnitPrice.ToString("C", CultureInfo.GetCultureInfo("sv-SE"))</MudTd>
+                            <MudTd DataLabel="Subtotal">@((context.Quantity * context.UnitPrice).ToString("C", CultureInfo.GetCultureInfo("sv-SE")))</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudItem>
+
+                <MudItem xs="12">
+                    <MudDivider Class="my-4" />
+                </MudItem>
+
+                <MudItem xs="12">
+                    <div class="d-flex justify-end">
+                        <div style="min-width: 250px;">
+                            <div class="d-flex justify-space-between mb-2">
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">Tax Amount:</MudText>
+                                <MudText Typo="Typo.body1">@Order.TaxAmount.ToString("C", CultureInfo.GetCultureInfo("sv-SE"))</MudText>
+                            </div>
+                            <div class="d-flex justify-space-between mb-2">
+                                <MudText Typo="Typo.h6">Total Amount:</MudText>
+                                <MudText Typo="Typo.h6" Color="Color.Primary">@Order.TotalAmount.ToString("C", CultureInfo.GetCultureInfo("sv-SE"))</MudText>
+                            </div>
+                        </div>
+                    </div>
+                </MudItem>
+            </MudGrid>
+        }
+        else
+        {
+            <MudText>No order information available</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public OrderDTO? Order { get; set; }
+
+    private Color GetStatusColor(string status)
+    {
+        return status.ToLowerInvariant() switch
+        {
+            "completed" => Color.Success,
+            "pending" => Color.Warning,
+            "cancelled" => Color.Error,
+            "processing" => Color.Info,
+            _ => Color.Default
+        };
+    }
+}

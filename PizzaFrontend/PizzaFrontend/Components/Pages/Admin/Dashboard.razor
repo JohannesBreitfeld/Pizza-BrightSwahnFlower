@@ -1,0 +1,196 @@
+@page "/admin"
+@layout PizzaFrontend.Components.Layout.AdminLayout
+@using PizzaFrontend.Interfaces
+@inject IAdminPizzaClient PizzaClient
+@inject IAdminOrderClient OrderClient
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+
+<PageTitle>Admin Dashboard - Bright Swahn Flower Pizza</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Dashboard</MudText>
+
+@if (_isLoading)
+{
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard>
+                <MudCardContent>
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="60px" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard>
+                <MudCardContent>
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="60px" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard>
+                <MudCardContent>
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="60px" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard>
+                <MudCardContent>
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="60px" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+else
+{
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <div class="d-flex justify-space-between align-center">
+                        <div>
+                            <MudText Typo="Typo.h3">@_totalPizzas</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Total Pizzas</MudText>
+                        </div>
+                        <MudIcon Icon="@Icons.Material.Filled.LocalPizza" Size="Size.Large" Color="Color.Primary" />
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <div class="d-flex justify-space-between align-center">
+                        <div>
+                            <MudText Typo="Typo.h3">@_totalOrders</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Total Orders</MudText>
+                        </div>
+                        <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Size="Size.Large" Color="Color.Primary" />
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <div class="d-flex justify-space-between align-center">
+                        <div>
+                            <MudText Typo="Typo.h3">@_totalIngredients</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">Total Ingredients</MudText>
+                        </div>
+                        <MudIcon Icon="@Icons.Material.Filled.Restaurant" Size="Size.Large" Color="Color.Primary" />
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="2">
+                <MudCardContent>
+                    <div class="d-flex justify-space-between align-center">
+                        <div>
+                            <MudText Typo="Typo.h3"><MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" /></MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">System Status</MudText>
+                        </div>
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Large" Color="Color.Success" />
+                    </div>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <MudPaper Class="mt-6 pa-4" Elevation="2">
+        <MudText Typo="Typo.h5" Class="mb-4">Quick Actions</MudText>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="4">
+                <MudButton
+                    Variant="Variant.Filled"
+                    Color="Color.Primary"
+                    FullWidth="true"
+                    StartIcon="@Icons.Material.Filled.Add"
+                    Href="/admin/pizzas">
+                    Add New Pizza
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudButton
+                    Variant="Variant.Outlined"
+                    Color="Color.Primary"
+                    FullWidth="true"
+                    StartIcon="@Icons.Material.Filled.LocalPizza"
+                    Href="/admin/pizzas">
+                    Manage Pizzas
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="4">
+                <MudButton
+                    Variant="Variant.Outlined"
+                    Color="Color.Primary"
+                    FullWidth="true"
+                    StartIcon="@Icons.Material.Filled.ShoppingCart"
+                    Href="/admin/orders">
+                    View Orders
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+}
+
+@code {
+    private bool _isLoading = true;
+    private int _totalPizzas = 0;
+    private int _totalOrders = 0;
+    private int _totalIngredients = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardData();
+    }
+
+    private async Task LoadDashboardData()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var pizzasResponse = await PizzaClient.GetAllPizzasAsync();
+            if (pizzasResponse.IsSuccessStatusCode)
+            {
+                var pizzas = await pizzasResponse.Content.ReadFromJsonAsync<List<PizzaFrontend.Contracts.Pizzas.PizzaDTO>>();
+                _totalPizzas = pizzas?.Count ?? 0;
+            }
+
+            var ingredientsResponse = await PizzaClient.GetAllIngredientsAsync();
+            if (ingredientsResponse.IsSuccessStatusCode)
+            {
+                var ingredients = await ingredientsResponse.Content.ReadFromJsonAsync<List<PizzaFrontend.Contracts.Pizzas.IngredientDTO>>();
+                _totalIngredients = ingredients?.Count ?? 0;
+            }
+
+            var ordersResponse = await OrderClient.GetAllOrdersAsync(1, 100);
+            if (ordersResponse.IsSuccessStatusCode)
+            {
+                var orders = await ordersResponse.Content.ReadFromJsonAsync<List<PizzaFrontend.Contracts.Admin.OrderDTO>>();
+                _totalOrders = orders?.Count ?? 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading dashboard data: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+}
