@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Identity.Api/Identity.Api.csproj" Id="f5836013-259d-4904-8952-f402d3efcfb4" />
+  <Project Path="Identity.Core/Identity.Core.csproj" />
+  <Project Path="Identity.Infrastructure/Identity.Infrastructure.csproj" />
+  <Project Path="Identity.Tests/Identity.Tests.csproj" Id="01e78cf8-f202-4af0-9fe6-84b46cdcc4e2" />
+</Solution>
