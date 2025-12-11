@@ -1,5 +1,7 @@
 using OrderService.Api.BackgroundServices;
 using OrderService.Api.Endpoints;
+using OrderService.Core.Contracts;
+using OrderService.Infrastructure.Persistence;
 using Serilog;
 
 namespace OrderService.Api;
@@ -58,5 +60,13 @@ public static class ApiExtensions
             logger.LogError(ex, "Failed to initialize Cosmos DB");
             throw;
         }
+    }
+    public static async Task SeedOrdersAsync(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+
+        var repository = scope.ServiceProvider.GetRequiredService<IOrderRepository>();
+
+        await DataSeedService.SeedOrdersAsync(repository);
     }
 }

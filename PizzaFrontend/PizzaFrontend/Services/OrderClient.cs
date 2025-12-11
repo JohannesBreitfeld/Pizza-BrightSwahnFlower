@@ -7,7 +7,7 @@ namespace PizzaFrontend.Services
     {
         public async Task<HttpResponseMessage> PlaceOrderAsync(CreateOrderRequest request)
         {
-            return await client.PostAsJsonAsync("", request);
+            return await client.PostAsJsonAsync("orders", request);
         }
     }
 }

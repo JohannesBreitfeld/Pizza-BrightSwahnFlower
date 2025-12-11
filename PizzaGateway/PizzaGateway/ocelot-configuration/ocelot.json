@@ -14,6 +14,58 @@
         "Post"
       ],
       "SwaggerKey": "orders"
+    },
+    {
+      "DownstreamPathTemplate": "/api/pizzas",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "pizzainformationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/pizzas",
+      "UpstreamHttpMethod": [ "Get" ],
+      "SwaggerKey": "information"
+    },
+    {
+      "DownstreamPathTemplate": "/api/pizzas/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "pizzainformationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/pizzas/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "SwaggerKey": "information"
+    },
+    {
+      "DownstreamPathTemplate": "/api/ingredients",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "pizzainformationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/ingredients",
+      "UpstreamHttpMethod": [ "Get" ],
+      "SwaggerKey": "information"
+    },
+    {
+      "DownstreamPathTemplate": "/api/pizzas/create",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "pizzainformationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/pizzas/create",
+      "UpstreamHttpMethod": [ "Post" ],
+      "SwaggerKey": "information"
     }
   ],
   "SwaggerEndPoints": [
@@ -24,6 +76,16 @@
           "Name": "Order Service API",
           "Version": "v1",
           "Url": "http://orderservice:8080/openapi/v1.json"
+        }
+      ]
+    },
+    {
+      "Key": "information",
+      "Config": [
+        {
+          "Name": "Pizza Information API",
+          "Version": "v1",
+          "Url": "http://pizzainformationservice:8080/swagger/v1/swagger.json"
         }
       ]
     }

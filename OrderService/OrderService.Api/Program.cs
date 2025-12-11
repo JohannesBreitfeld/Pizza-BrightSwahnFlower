@@ -17,6 +17,7 @@ try
 {
     await app.InitializeInfrastructureAsync();
     app.ConfigureApiPipeline();
+    await app.SeedOrdersAsync();
     app.Run();
 }
 catch (Exception ex)
