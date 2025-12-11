@@ -1,0 +1,258 @@
+﻿@using PizzaFrontend.Contracts.Pizzas
+@using PizzaFrontend.Contracts.Admin
+@using PizzaFrontend.Interfaces
+@using MudBlazor
+@inject IAdminPizzaClient PizzaClient
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        @if (_isLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else
+        {
+            <MudForm @ref="_form" @bind-IsValid="@_isFormValid">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_name"
+                                      Label="Pizza Name"
+                                      Variant="Variant.Outlined"
+                                      Required="true"
+                                      RequiredError="Name is required"
+                                      Margin="Margin.Dense" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudNumericField @bind-Value="_price"
+                                         Label="Price (AU$)"
+                                         Variant="Variant.Outlined"
+                                         Required="true"
+                                         RequiredError="Price is required"
+                                         Min="0m"
+                                         Margin="Margin.Dense"
+                                         Format="N2" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="_imageUrl"
+                                      Label="Image URL"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      HelperText="Optional" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudSelect T="IngredientDTO"
+                                   Label="Ingredients"
+                                   MultiSelection="true"
+                                   @bind-SelectedValues="_selectedIngredients"
+                                   Variant="Variant.Outlined"
+                                   Required="true"
+                                   RequiredError="At least one ingredient is required"
+                                   Margin="Margin.Dense"
+                                   ToStringFunc="@(i => i?.Name ?? "")">
+                            @foreach (var ingredient in _availableIngredients)
+                            {
+                                <MudSelectItem T="IngredientDTO" Value="@ingredient">
+                                    @ingredient.Name
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    @if (!string.IsNullOrEmpty(_errorMessage))
+                    {
+                        <MudItem xs="12">
+                            <MudAlert Severity="Severity.Error">
+                                @_errorMessage
+                            </MudAlert>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="Save"
+                   Disabled="_isSaving">
+            @if (_isSaving)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Saving...</MudText>
+            }
+            else
+            {
+                <MudText>Save</MudText>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public int? PizzaId { get; set; }
+
+    [Parameter]
+    public bool IsEditMode { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnSaveCompleted { get; set; }
+
+    private MudForm? _form;
+    private bool _isFormValid;
+    private bool _isLoading = true;
+    private bool _isSaving = false;
+    private string _errorMessage = string.Empty;
+
+    private string _name = string.Empty;
+    private decimal _price = 0;
+    private string? _imageUrl;
+    private IEnumerable<IngredientDTO> _selectedIngredients = new HashSet<IngredientDTO>();
+    private List<IngredientDTO> _availableIngredients = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadIngredients();
+
+        if (IsEditMode && PizzaId.HasValue)
+        {
+            await LoadPizza(PizzaId.Value);
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task LoadIngredients()
+    {
+        try
+        {
+            var response = await PizzaClient.GetAllIngredientsAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                var ingredients = await response.Content.ReadFromJsonAsync<List<IngredientDTO>>();
+                _availableIngredients = ingredients ?? new List<IngredientDTO>();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to load ingredients: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading ingredients: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadPizza(int pizzaId)
+    {
+        try
+        {
+            var response = await PizzaClient.GetPizzaByIdAsync(pizzaId);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var pizza = await response.Content.ReadFromJsonAsync<PizzaDTO>();
+                if (pizza != null)
+                {
+                    _name = pizza.Name;
+                    _price = pizza.Price;
+                    _imageUrl = pizza.ImageUrl;
+                    _selectedIngredients = pizza.Ingredients;
+                }
+            }
+            else
+            {
+                Snackbar.Add($"Failed to load pizza: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading pizza: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task Save()
+    {
+        _errorMessage = string.Empty;
+
+        if (_form == null)
+            return;
+
+        await _form.Validate();
+
+        if (!_isFormValid)
+            return;
+
+        _isSaving = true;
+        StateHasChanged();
+
+        try
+        {
+            var ingredientIds = _selectedIngredients.Select(i => i.Id).ToList();
+
+            if (IsEditMode && PizzaId.HasValue)
+            {
+                var updateRequest = new UpdatePizzaRequest(
+                    _name,
+                    _price,
+                    _imageUrl,
+                    ingredientIds
+                );
+
+                var response = await PizzaClient.UpdatePizzaAsync(PizzaId.Value, updateRequest);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Snackbar.Add($"Pizza '{_name}' updated successfully", Severity.Success);
+                    await OnSaveCompleted.InvokeAsync(true);
+                }
+                else
+                {
+                    _errorMessage = $"Failed to update pizza: {response.StatusCode}";
+                }
+            }
+            else
+            {
+                var createRequest = new CreatePizzaRequest(
+                    _name,
+                    _price,
+                    _imageUrl,
+                    ingredientIds
+                );
+
+                var response = await PizzaClient.CreatePizzaAsync(createRequest);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Snackbar.Add($"Pizza '{_name}' created successfully", Severity.Success);
+                    await OnSaveCompleted.InvokeAsync(true);
+                }
+                else
+                {
+                    _errorMessage = $"Failed to create pizza: {response.StatusCode}";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Error saving pizza: {ex.Message}";
+            Snackbar.Add(_errorMessage, Severity.Error);
+        }
+        finally
+        {
+            _isSaving = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Cancel()
+    {
+        await OnSaveCompleted.InvokeAsync(false);
+    }
+}

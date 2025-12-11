@@ -16,6 +16,53 @@
       "SwaggerKey": "orders"
     },
     {
+      "DownstreamPathTemplate": "/api/auth/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/identity/login",
+      "UpstreamHttpMethod": [
+        "Post"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/refresh",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/identity/refresh",
+      "UpstreamHttpMethod": [
+        "Post"
+      ],
+      "SwaggerKey": "identity"
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/logout",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/identity/logout",
+      "UpstreamHttpMethod": [
+        "Post"
+      ],
+      "SwaggerKey": "identity"
+    }
+  ],
+    },
+    {
       "DownstreamPathTemplate": "/api/pizzas",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -76,6 +123,16 @@
           "Name": "Order Service API",
           "Version": "v1",
           "Url": "http://orderservice:8080/openapi/v1.json"
+        }
+      ]
+    },
+    {
+      "Key": "identity",
+      "Config": [
+        {
+          "Name": "Identity Service API",
+          "Version": "v1",
+          "Url": "http://identity:8080/openapi/v1.json"
         }
       ]
     },

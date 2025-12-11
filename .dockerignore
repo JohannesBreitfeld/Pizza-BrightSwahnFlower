@@ -1,0 +1,48 @@
+# Build outputs
+**/bin/
+**/obj/
+**/out/
+
+# Visual Studio
+**/.vs/
+**/.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Git
+**/.git/
+**/.gitignore
+**/.gitattributes
+
+# Docker
+**/docker-compose*.yml
+**/.dockerignore
+**/Dockerfile*
+
+# Documentation
+**/README.md
+**/*.md
+
+# Azure DevOps
+**/.azure-pipelines/
+
+# Tests
+**/TestResults/
+
+# NuGet
+**/packages/
+*.nupkg
+
+# Environment files
+**/.env
+**/.env.*
+
+# Logs
+**/logs/
+**/*.log
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
