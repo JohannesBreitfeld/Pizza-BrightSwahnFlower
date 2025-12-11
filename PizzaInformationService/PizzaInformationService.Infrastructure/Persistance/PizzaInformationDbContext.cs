@@ -21,6 +21,11 @@ namespace PizzaInformationService.Infrastructure.Persistance
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configure Price property precision
+            modelBuilder.Entity<Pizza>()
+                .Property(p => p.Price)
+                .HasPrecision(18, 2);
+
             modelBuilder.Entity<Pizza>().HasData(     
                 new Pizza { Id = 1, Name = "Margherita", Price = 13.00M, ImageUrl = "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
                 new Pizza { Id = 2, Name = "Pepperoni Pizza", Price = 14.00M, ImageUrl = "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?q=80&w=1476&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },

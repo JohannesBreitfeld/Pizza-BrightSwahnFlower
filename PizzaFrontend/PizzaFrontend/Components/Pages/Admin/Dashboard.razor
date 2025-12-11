@@ -181,8 +181,8 @@ else
             var ordersResponse = await OrderClient.GetAllOrdersAsync(1, 100);
             if (ordersResponse.IsSuccessStatusCode)
             {
-                var orders = await ordersResponse.Content.ReadFromJsonAsync<List<OrderDTO>>();
-                _totalOrders = orders?.Count ?? 0;
+                var result = await ordersResponse.Content.ReadFromJsonAsync<GetAllOrdersResponse>();
+                _totalOrders = result?.Orders?.Count ?? 0;
             }
         }
         catch (Exception ex)
