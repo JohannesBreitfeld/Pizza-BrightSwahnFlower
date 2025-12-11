@@ -8,9 +8,4 @@ public class AdminOrderClient(HttpClient client) : IAdminOrderClient
     {
         return await client.GetAsync($"?page={page}&pageSize={pageSize}");
     }
-
-    public async Task<HttpResponseMessage> GetOrderByIdAsync(string orderId)
-    {
-        return await client.GetAsync($"{orderId}");
-    }
 }
