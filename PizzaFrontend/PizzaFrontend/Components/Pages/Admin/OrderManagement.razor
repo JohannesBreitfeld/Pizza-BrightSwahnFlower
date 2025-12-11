@@ -1,0 +1,124 @@
+@page "/admin/orders"
+@layout PizzaFrontend.Components.Layout.AdminLayout
+@using PizzaFrontend.Interfaces
+@using PizzaFrontend.Contracts.Admin
+@using System.Globalization
+@inject IAdminOrderClient OrderClient
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@rendermode InteractiveServer
+
+<PageTitle>Order Management - Bright Swahn Flower Pizza</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Order Management</MudText>
+
+<MudDataGrid
+    T="OrderDTO"
+    Items="@_orders"
+    Loading="@_isLoading"
+    ReadOnly="true"
+    QuickFilter="@_quickFilter"
+    Hover="true"
+    Dense="true"
+    Filterable="true"
+    SortMode="SortMode.Multiple">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Orders</MudText>
+        <MudSpacer />
+        <MudTextField
+            @bind-Value="_searchString"
+            Placeholder="Search"
+            Adornment="Adornment.Start"
+            AdornmentIcon="@Icons.Material.Filled.Search"
+            IconSize="Size.Medium"
+            Class="mt-0"
+            Immediate="true" />
+        <MudButton
+            Variant="Variant.Filled"
+            Color="Color.Primary"
+            StartIcon="@Icons.Material.Filled.Refresh"
+            OnClick="LoadOrders"
+            Class="ml-2">
+            Refresh
+        </MudButton>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.OrderId" Title="Order ID" />
+        <PropertyColumn Property="x => x.CustomerEmail" Title="Customer Email" />
+        <PropertyColumn Property="x => x.Items.Count" Title="Items" Sortable="false" Filterable="false" />
+        <TemplateColumn Title="Total Amount" Sortable="true" SortBy="@(x => x.TotalAmount)">
+            <CellTemplate>
+                @context.Item.TotalAmount.ToString("C", CultureInfo.GetCultureInfo("en-AU"))
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Tax Amount" Sortable="true" SortBy="@(x => x.TaxAmount)">
+            <CellTemplate>
+                @context.Item.TaxAmount.ToString("C", CultureInfo.GetCultureInfo("en-AU"))
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Date" Sortable="true" SortBy="@(x => x.CreatedAt)">
+            <CellTemplate>
+                @context.Item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="OrderDTO" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<OrderDTO> _orders = new();
+    private bool _isLoading = true;
+    private string _searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await OrderClient.GetAllOrdersAsync(1, 100);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var orders = await response.Content.ReadFromJsonAsync<List<OrderDTO>>();
+                _orders = orders ?? new List<OrderDTO>();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to load orders: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading orders: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private Func<OrderDTO, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.OrderId.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.CustomerEmail.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+    }
+}

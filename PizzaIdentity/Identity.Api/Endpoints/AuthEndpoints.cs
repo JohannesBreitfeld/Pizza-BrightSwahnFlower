@@ -10,19 +10,19 @@ public static class AuthEndpoints
 {
     public static IEndpointRouteBuilder AddAuthEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost("api/auth/login", HandleLoginAsync)
+        app.MapPost("/api/auth/login", HandleLoginAsync)
             .WithName("Login")
             .WithTags("Auth")
             .Produces<LoginResponse>(StatusCodes.Status200OK)
             .ProducesValidationProblem();
 
-        app.MapPost("api/auth/refresh", HandleRefreshAsync)
+        app.MapPost("/api/auth/refresh", HandleRefreshAsync)
             .WithName("Refresh")
             .WithTags("Auth")
             .Produces<RefreshResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
-        app.MapPost("api/auth/logout", HandleLogoutAsync)
+        app.MapPost("/api/auth/logout", HandleLogoutAsync)
             .WithName("Logout")
             .WithTags("Auth")
             .Produces(StatusCodes.Status204NoContent)

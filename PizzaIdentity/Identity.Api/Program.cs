@@ -18,7 +18,7 @@ app.UseGlobalExceptionHandler();
 app.MapOpenApi();
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("/openapi/v1.json", "OrderService API V1");
+    options.SwaggerEndpoint("/openapi/v1.json", "Identity API V1");
 });
 
 app.UseAuthentication();

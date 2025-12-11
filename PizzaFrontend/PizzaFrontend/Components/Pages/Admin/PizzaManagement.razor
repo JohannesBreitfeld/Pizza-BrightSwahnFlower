@@ -1,0 +1,214 @@
+﻿@page "/admin/pizzas"
+@layout PizzaFrontend.Components.Layout.AdminLayout
+@using PizzaFrontend.Interfaces
+@using PizzaFrontend.Contracts.Pizzas
+@using PizzaFrontend.Contracts.Admin
+@using System.Globalization
+@inject IAdminPizzaClient PizzaClient
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+@rendermode InteractiveServer
+
+<PageTitle>Pizza Management - Bright Swahn Flower Pizza</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Pizza Management</MudText>
+
+<MudDataGrid T="PizzaDTO"
+             Items="@_pizzas"
+             Loading="@_isLoading"
+             ReadOnly="true"
+             QuickFilter="@_quickFilter"
+             Hover="true"
+             Dense="true"
+             Filterable="true"
+             SortMode="SortMode.Multiple">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Pizzas</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString"
+                      Placeholder="Search"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"
+                      Immediate="true" />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="OpenCreateDialog"
+                   Class="ml-2">
+            Add Pizza
+        </MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="LoadPizzas"
+                   Class="ml-2">
+            Refresh
+        </MudButton>
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn Title="Image" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudImage Src="@context.Item.ImageUrl" Alt="@context.Item.Name" Height="50" Width="50" ObjectFit="ObjectFit.Cover" />
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Name" Title="Name" />
+        <TemplateColumn Title="Price" Sortable="true" SortBy="@(x => x.Price)">
+            <CellTemplate>
+                @context.Item.Price.ToString("C", CultureInfo.GetCultureInfo("sv-SE"))
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Ingredients" Sortable="false" Filterable="false">
+            <CellTemplate>
+                @string.Join(", ", context.Item.Ingredients.Select(i => i.Name))
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="Actions" Sortable="false" Filterable="false">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                               Size="Size.Small"
+                               Color="Color.Primary"
+                               OnClick="@(() => OpenEditDialog(context.Item))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                               Size="Size.Small"
+                               Color="Color.Error"
+                               OnClick="@(() => DeletePizza(context.Item))" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="PizzaDTO" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<PizzaDTO> _pizzas = new();
+    private bool _isLoading = true;
+    private string _searchString = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPizzas();
+    }
+
+    private async Task LoadPizzas()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await PizzaClient.GetAllPizzasAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                var pizzas = await response.Content.ReadFromJsonAsync<List<PizzaDTO>>();
+                _pizzas = pizzas ?? new List<PizzaDTO>();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to load pizzas: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading pizzas: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private Func<PizzaDTO, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.Ingredients.Any(i => i.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)))
+            return true;
+
+        return false;
+    };
+
+    private async Task OpenCreateDialog()
+    {
+        var parameters = new DialogParameters<PizzaEditDialog>
+        {
+            { x => x.OnSaveCompleted, EventCallback.Factory.Create<bool>(this, HandleDialogSave) }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        await DialogService.ShowAsync<PizzaEditDialog>("Add New Pizza", parameters, options);
+    }
+
+    private async Task OpenEditDialog(PizzaDTO pizza)
+    {
+        var parameters = new DialogParameters<PizzaEditDialog>
+        {
+            { x => x.PizzaId, pizza.Id },
+            { x => x.IsEditMode, true },
+            { x => x.OnSaveCompleted, EventCallback.Factory.Create<bool>(this, HandleDialogSave) }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        await DialogService.ShowAsync<PizzaEditDialog>("Edit Pizza", parameters, options);
+    }
+
+    private async Task HandleDialogSave(bool saved)
+    {
+        if (saved)
+        {
+            await LoadPizzas();
+        }
+    }
+
+    private async Task DeletePizza(PizzaDTO pizza)
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Delete Pizza",
+            $"Are you sure you want to delete '{pizza.Name}'? This action cannot be undone.",
+            yesText: "Delete",
+            cancelText: "Cancel");
+
+        if (result == true)
+        {
+            try
+            {
+                var response = await PizzaClient.DeletePizzaAsync(pizza.Id);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Snackbar.Add($"Pizza '{pizza.Name}' deleted successfully", Severity.Success);
+                    await LoadPizzas();
+                }
+                else
+                {
+                    Snackbar.Add($"Failed to delete pizza: {response.StatusCode}", Severity.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error deleting pizza: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+}
+
