@@ -1,4 +1,4 @@
-@using PizzaFrontend.Contracts.Pizzas
+﻿@using PizzaFrontend.Contracts.Pizzas
 @using PizzaFrontend.Contracts.Admin
 @using PizzaFrontend.Interfaces
 @using MudBlazor
@@ -16,47 +16,43 @@
             <MudForm @ref="_form" @bind-IsValid="@_isFormValid">
                 <MudGrid>
                     <MudItem xs="12">
-                        <MudTextField
-                            @bind-Value="_name"
-                            Label="Pizza Name"
-                            Variant="Variant.Outlined"
-                            Required="true"
-                            RequiredError="Name is required"
-                            Margin="Margin.Dense" />
+                        <MudTextField @bind-Value="_name"
+                                      Label="Pizza Name"
+                                      Variant="Variant.Outlined"
+                                      Required="true"
+                                      RequiredError="Name is required"
+                                      Margin="Margin.Dense" />
                     </MudItem>
 
                     <MudItem xs="12">
-                        <MudNumericField
-                            @bind-Value="_price"
-                            Label="Price (SEK)"
-                            Variant="Variant.Outlined"
-                            Required="true"
-                            RequiredError="Price is required"
-                            Min="0m"
-                            Margin="Margin.Dense"
-                            Format="N2" />
+                        <MudNumericField @bind-Value="_price"
+                                         Label="Price (AU$)"
+                                         Variant="Variant.Outlined"
+                                         Required="true"
+                                         RequiredError="Price is required"
+                                         Min="0m"
+                                         Margin="Margin.Dense"
+                                         Format="N2" />
                     </MudItem>
 
                     <MudItem xs="12">
-                        <MudTextField
-                            @bind-Value="_imageUrl"
-                            Label="Image URL"
-                            Variant="Variant.Outlined"
-                            Margin="Margin.Dense"
-                            HelperText="Optional" />
+                        <MudTextField @bind-Value="_imageUrl"
+                                      Label="Image URL"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      HelperText="Optional" />
                     </MudItem>
 
                     <MudItem xs="12">
-                        <MudSelect
-                            T="IngredientDTO"
-                            Label="Ingredients"
-                            MultiSelection="true"
-                            @bind-SelectedValues="_selectedIngredients"
-                            Variant="Variant.Outlined"
-                            Required="true"
-                            RequiredError="At least one ingredient is required"
-                            Margin="Margin.Dense"
-                            ToStringFunc="@(i => i?.Name ?? "")">
+                        <MudSelect T="IngredientDTO"
+                                   Label="Ingredients"
+                                   MultiSelection="true"
+                                   @bind-SelectedValues="_selectedIngredients"
+                                   Variant="Variant.Outlined"
+                                   Required="true"
+                                   RequiredError="At least one ingredient is required"
+                                   Margin="Margin.Dense"
+                                   ToStringFunc="@(i => i?.Name ?? "")">
                             @foreach (var ingredient in _availableIngredients)
                             {
                                 <MudSelectItem T="IngredientDTO" Value="@ingredient">
@@ -80,11 +76,10 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton
-            Color="Color.Primary"
-            Variant="Variant.Filled"
-            OnClick="Save"
-            Disabled="_isSaving">
+        <MudButton Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   OnClick="Save"
+                   Disabled="_isSaving">
             @if (_isSaving)
             {
                 <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />

@@ -76,23 +76,27 @@
 
     private async Task CheckAuthorization()
     {
+        Console.WriteLine("[DEBUG] AdminLayout.CheckAuthorization - Starting auth check");
         _isLoading = true;
         StateHasChanged();
 
         try
         {
             _isAuthorized = await AuthStateService.IsAuthenticatedAsync();
+            Console.WriteLine($"[DEBUG] AdminLayout.CheckAuthorization - IsAuthorized: {_isAuthorized}");
 
             if (!_isAuthorized)
             {
+                Console.WriteLine("[DEBUG] AdminLayout.CheckAuthorization - NOT authorized, redirecting to /login");
                 Navigation.NavigateTo("/login");
                 return;
             }
 
             var userInfo = await AuthStateService.GetCurrentUserAsync();
+            Console.WriteLine($"[DEBUG] AdminLayout.CheckAuthorization - UserInfo: {userInfo?.Username ?? "NULL"}");
             if (userInfo != null)
             {
-                _userEmail = userInfo.Email;
+                _userEmail = userInfo.Username;
             }
         }
         finally

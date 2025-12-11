@@ -1,4 +1,4 @@
-@page "/admin/pizzas"
+﻿@page "/admin/pizzas"
 @layout PizzaFrontend.Components.Layout.AdminLayout
 @using PizzaFrontend.Interfaces
 @using PizzaFrontend.Contracts.Pizzas
@@ -13,41 +13,37 @@
 
 <MudText Typo="Typo.h4" Class="mb-4">Pizza Management</MudText>
 
-<MudDataGrid
-    T="PizzaDTO"
-    Items="@_pizzas"
-    Loading="@_isLoading"
-    ReadOnly="true"
-    QuickFilter="@_quickFilter"
-    Hover="true"
-    Dense="true"
-    Filterable="true"
-    SortMode="SortMode.Multiple">
+<MudDataGrid T="PizzaDTO"
+             Items="@_pizzas"
+             Loading="@_isLoading"
+             ReadOnly="true"
+             QuickFilter="@_quickFilter"
+             Hover="true"
+             Dense="true"
+             Filterable="true"
+             SortMode="SortMode.Multiple">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Pizzas</MudText>
         <MudSpacer />
-        <MudTextField
-            @bind-Value="_searchString"
-            Placeholder="Search"
-            Adornment="Adornment.Start"
-            AdornmentIcon="@Icons.Material.Filled.Search"
-            IconSize="Size.Medium"
-            Class="mt-0"
-            Immediate="true" />
-        <MudButton
-            Variant="Variant.Filled"
-            Color="Color.Success"
-            StartIcon="@Icons.Material.Filled.Add"
-            OnClick="OpenCreateDialog"
-            Class="ml-2">
+        <MudTextField @bind-Value="_searchString"
+                      Placeholder="Search"
+                      Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Filled.Search"
+                      IconSize="Size.Medium"
+                      Class="mt-0"
+                      Immediate="true" />
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Success"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   OnClick="OpenCreateDialog"
+                   Class="ml-2">
             Add Pizza
         </MudButton>
-        <MudButton
-            Variant="Variant.Filled"
-            Color="Color.Primary"
-            StartIcon="@Icons.Material.Filled.Refresh"
-            OnClick="LoadPizzas"
-            Class="ml-2">
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Refresh"
+                   OnClick="LoadPizzas"
+                   Class="ml-2">
             Refresh
         </MudButton>
     </ToolBarContent>
@@ -70,16 +66,14 @@
         </TemplateColumn>
         <TemplateColumn Title="Actions" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudIconButton
-                    Icon="@Icons.Material.Filled.Edit"
-                    Size="Size.Small"
-                    Color="Color.Primary"
-                    OnClick="@(() => OpenEditDialog(context.Item))" />
-                <MudIconButton
-                    Icon="@Icons.Material.Filled.Delete"
-                    Size="Size.Small"
-                    Color="Color.Error"
-                    OnClick="@(() => DeletePizza(context.Item))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                               Size="Size.Small"
+                               Color="Color.Primary"
+                               OnClick="@(() => OpenEditDialog(context.Item))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                               Size="Size.Small"
+                               Color="Color.Error"
+                               OnClick="@(() => DeletePizza(context.Item))" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>
@@ -217,3 +211,4 @@
         }
     }
 }
+

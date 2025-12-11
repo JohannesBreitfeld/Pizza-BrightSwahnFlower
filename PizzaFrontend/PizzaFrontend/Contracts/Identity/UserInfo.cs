@@ -1,7 +1,7 @@
 namespace PizzaFrontend.Contracts.Identity;
 
 public sealed record UserInfo(
-    string Email,
+    string Username,
     string[] Roles,
     Dictionary<string, string> Claims
 );

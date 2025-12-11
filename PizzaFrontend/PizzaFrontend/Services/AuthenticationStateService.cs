@@ -41,17 +41,17 @@ public class AuthenticationStateService
             var jwtToken = _jwtHandler.ReadJwtToken(token);
             var claims = jwtToken.Claims.ToList();
 
-            var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email || c.Type == "email")?.Value ?? "Unknown";
-            var roles = claims.Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
+            var username = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name || c.Type == "unique_name")?.Value ?? "Unknown";
+            var roles = claims.Where(c => c.Type == ClaimTypes.Role || c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
                               .Select(c => c.Value)
                               .ToArray();
 
             var claimsDictionary = claims
-                .Where(c => c.Type != ClaimTypes.Email && c.Type != "email" && c.Type != ClaimTypes.Role && c.Type != "role")
+                .Where(c => c.Type != ClaimTypes.Name && c.Type != "unique_name" && c.Type != ClaimTypes.Role && c.Type != "http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
                 .GroupBy(c => c.Type)
                 .ToDictionary(g => g.Key, g => g.First().Value);
 
-            return new UserInfo(email, roles, claimsDictionary);
+            return new UserInfo(username, roles, claimsDictionary);
         }
         catch
         {

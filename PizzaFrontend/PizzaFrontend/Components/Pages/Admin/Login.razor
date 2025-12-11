@@ -118,10 +118,16 @@
 
                 if (loginResponse != null)
                 {
+                    if (string.IsNullOrWhiteSpace(loginResponse.Token))
+                    {
+                        _errorMessage = "Login succeeded but no access token was returned from the server. Please check your Identity Service configuration.";
+                        return;
+                    }
+
                     await TokenService.SetTokensAsync(
-                        loginResponse.AccessToken,
+                        loginResponse.Token,
                         loginResponse.RefreshToken,
-                        loginResponse.ExpiresIn
+                        loginResponse.ExpiresAt
                     );
 
                     AuthStateService.NotifyAuthenticationStateChanged();

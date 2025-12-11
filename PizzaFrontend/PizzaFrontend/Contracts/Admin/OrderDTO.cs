@@ -6,8 +6,7 @@ public sealed record OrderDTO(
     List<OrderItemDTO> Items,
     decimal TotalAmount,
     decimal TaxAmount,
-    DateTime CreatedAt,
-    string Status
+    DateTime CreatedAt
 );
 
 public sealed record OrderItemDTO(

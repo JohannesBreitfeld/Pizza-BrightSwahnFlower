@@ -8,13 +8,20 @@ public class TokenService : ITokenService
     private string? _accessToken;
     private string? _refreshToken;
     private DateTime? _expiresAt;
-    private readonly JwtSecurityTokenHandler _jwtHandler = new();
 
     public Task SetTokensAsync(string accessToken, string refreshToken, int expiresIn)
     {
         _accessToken = accessToken;
         _refreshToken = refreshToken;
         _expiresAt = DateTime.UtcNow.AddSeconds(expiresIn);
+        return Task.CompletedTask;
+    }
+
+    public Task SetTokensAsync(string accessToken, string refreshToken, DateTime expiresAt)
+    {
+        _accessToken = accessToken;
+        _refreshToken = refreshToken;
+        _expiresAt = expiresAt;
         return Task.CompletedTask;
     }
 
@@ -35,7 +42,8 @@ public class TokenService : ITokenService
             return Task.FromResult(false);
         }
 
-        return Task.FromResult(DateTime.UtcNow < _expiresAt);
+        var isValid = DateTime.UtcNow < _expiresAt;
+        return Task.FromResult(isValid);
     }
 
     public Task ClearTokensAsync()

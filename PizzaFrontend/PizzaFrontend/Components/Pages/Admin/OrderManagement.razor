@@ -61,22 +61,6 @@
                 @context.Item.CreatedAt.ToString("yyyy-MM-dd HH:mm")
             </CellTemplate>
         </TemplateColumn>
-        <TemplateColumn Title="Status" Sortable="true" SortBy="@(x => x.Status)">
-            <CellTemplate>
-                <MudChip T="string" Size="Size.Small" Color="@GetStatusColor(context.Item.Status)">
-                    @context.Item.Status
-                </MudChip>
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title="Actions" Sortable="false" Filterable="false">
-            <CellTemplate>
-                <MudIconButton
-                    Icon="@Icons.Material.Filled.Visibility"
-                    Size="Size.Small"
-                    Color="Color.Primary"
-                    OnClick="@(() => ViewOrderDetails(context.Item))" />
-            </CellTemplate>
-        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="OrderDTO" />
@@ -136,33 +120,5 @@
 
         return false;
     };
-
-    private Color GetStatusColor(string status)
-    {
-        return status.ToLowerInvariant() switch
-        {
-            "completed" => Color.Success,
-            "pending" => Color.Warning,
-            "cancelled" => Color.Error,
-            "processing" => Color.Info,
-            _ => Color.Default
-        };
-    }
-
-    private async Task ViewOrderDetails(OrderDTO order)
-    {
-        var parameters = new DialogParameters<OrderDetailDialog>
-        {
-            { x => x.Order, order }
-        };
-
-        var options = new DialogOptions
-        {
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true,
-            CloseButton = true
-        };
-
-        await DialogService.ShowAsync<OrderDetailDialog>("Order Details", parameters, options);
     }
 }

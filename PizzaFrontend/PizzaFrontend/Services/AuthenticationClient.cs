@@ -7,7 +7,8 @@ public class AuthenticationClient(HttpClient client) : IAuthenticationClient
 {
     public async Task<HttpResponseMessage> LoginAsync(LoginRequest request)
     {
-        return await client.PostAsJsonAsync("login", request);
+        var response = await client.PostAsJsonAsync("login", request);
+        return response;
     }
 
     public async Task<HttpResponseMessage> LogoutAsync()

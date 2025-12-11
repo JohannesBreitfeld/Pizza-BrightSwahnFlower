@@ -1,7 +1,7 @@
 namespace PizzaFrontend.Contracts.Identity;
 
 public sealed record RefreshTokenResponse(
-    string AccessToken,
+    string Token,
     string RefreshToken,
-    int ExpiresIn
+    DateTime ExpiresAt
 );

@@ -1,5 +1,7 @@
 @page "/admin"
 @layout PizzaFrontend.Components.Layout.AdminLayout
+@using PizzaFrontend.Contracts.Admin
+@using PizzaFrontend.Contracts.Pizzas
 @using PizzaFrontend.Interfaces
 @inject IAdminPizzaClient PizzaClient
 @inject IAdminOrderClient OrderClient
@@ -165,21 +167,21 @@ else
             var pizzasResponse = await PizzaClient.GetAllPizzasAsync();
             if (pizzasResponse.IsSuccessStatusCode)
             {
-                var pizzas = await pizzasResponse.Content.ReadFromJsonAsync<List<PizzaFrontend.Contracts.Pizzas.PizzaDTO>>();
+                var pizzas = await pizzasResponse.Content.ReadFromJsonAsync<List<PizzaDTO>>();
                 _totalPizzas = pizzas?.Count ?? 0;
             }
 
             var ingredientsResponse = await PizzaClient.GetAllIngredientsAsync();
             if (ingredientsResponse.IsSuccessStatusCode)
             {
-                var ingredients = await ingredientsResponse.Content.ReadFromJsonAsync<List<PizzaFrontend.Contracts.Pizzas.IngredientDTO>>();
+                var ingredients = await ingredientsResponse.Content.ReadFromJsonAsync<List<IngredientDTO>>();
                 _totalIngredients = ingredients?.Count ?? 0;
             }
 
             var ordersResponse = await OrderClient.GetAllOrdersAsync(1, 100);
             if (ordersResponse.IsSuccessStatusCode)
             {
-                var orders = await ordersResponse.Content.ReadFromJsonAsync<List<PizzaFrontend.Contracts.Admin.OrderDTO>>();
+                var orders = await ordersResponse.Content.ReadFromJsonAsync<List<OrderDTO>>();
                 _totalOrders = orders?.Count ?? 0;
             }
         }

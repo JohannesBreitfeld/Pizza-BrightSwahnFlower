@@ -1,6 +1,6 @@
 namespace PizzaFrontend.Contracts.Identity;
 
 public sealed record LoginRequest(
-    string Email,
+    string Username,
     string Password
 );
