@@ -1,0 +1,46 @@
+services:
+  pizzainformationservice:
+    build:
+      context: .
+      dockerfile: PizzaInformationService.Api/Dockerfile
+    container_name: pizza-information-service-dev
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - sql__HttpClientFactory=true
+    depends_on:
+      sql:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - pizza-network
+
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql-emulator-dev
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=BreitSwahnFlower1!
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - pizza-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S tcp:localhost,1433 -U sa -P BreitSwahnFlower1! -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    restart: 
+      on-failure
+
+volumes:
+  sql_data:
+
+networks:
+  pizza-network:
+    driver: bridge

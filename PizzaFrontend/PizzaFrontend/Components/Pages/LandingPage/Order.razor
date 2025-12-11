@@ -108,7 +108,6 @@
 
     private void SelectPizza(Pizza pizza)
     {
-        Console.WriteLine("Hej");
         if(_selectedPizza is not null)
         {
             _selectedPizza.IsSelected = false;
@@ -137,11 +136,11 @@
 
                 if(orderResponse is not null)
                 {
-                    Snackbar.Add($"Order {orderResponse.OrderId} successul");
+                    Snackbar.Add($"Order {orderResponse.OrderId} successful");
                 }
             } else
             {
-                Snackbar.Add("Orrder failed", Severity.Error);
+                Snackbar.Add("Order failed", Severity.Error);
             }
         }
         catch (Exception e)
