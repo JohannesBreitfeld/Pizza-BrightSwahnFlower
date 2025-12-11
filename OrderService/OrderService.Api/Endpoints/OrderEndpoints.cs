@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using OrderService.Core.Features.CreateOrder;
+using OrderService.Core.Features.GetAllOrders;
 
 namespace OrderService.Api.Endpoints;
 
@@ -14,7 +16,33 @@ public static class OrderEndpoints
             .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
             .ProducesValidationProblem();
 
+        app.MapGet("/api/orders/", HandleGetAllAsync)
+            .WithName("GetAllOrders")
+            .WithTags("Orders")
+            .Produces(StatusCodes.Status200OK);
+
         return app;
+    }
+
+    private static async Task<IResult> HandleGetAllAsync(
+        HttpContext context, 
+        IMediator mediator,
+        CancellationToken cancellationToken)
+    {
+        int? page = null;
+        int? pageSize = null;
+
+        if (int.TryParse(context.Request.Query["page"], out var parsedPage))
+            page = parsedPage;
+
+        if (int.TryParse(context.Request.Query["pageSize"], out var parsedPageSize))
+            pageSize = parsedPageSize;
+
+        var query = new GetAllOrdersQuery(page, pageSize);
+
+        var result = await mediator.Send(query);
+
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> HandleCreateOrderAsync(
