@@ -16,6 +16,21 @@
       "SwaggerKey": "orders"
     },
     {
+      "DownstreamPathTemplate": "/api/orders",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "orderservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/admin/orders",
+      "UpstreamHttpMethod": [
+        "Get"
+      ],
+      "SwaggerKey": "orders"
+    },
+    {
       "DownstreamPathTemplate": "/api/auth/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -59,8 +74,6 @@
         "Post"
       ],
       "SwaggerKey": "identity"
-    }
-  ],
     },
     {
       "DownstreamPathTemplate": "/api/pizzas",
@@ -84,7 +97,7 @@
           "Port": 8080
         }
       ],
-      "UpstreamPathTemplate": "/api/pizzas/{id}",
+      "UpstreamPathTemplate": "/api/admin/pizzas/{id}",
       "UpstreamHttpMethod": [ "Get" ],
       "SwaggerKey": "information"
     },
@@ -97,7 +110,7 @@
           "Port": 8080
         }
       ],
-      "UpstreamPathTemplate": "/api/ingredients",
+      "UpstreamPathTemplate": "/api/admin/pizzas/ingredients",
       "UpstreamHttpMethod": [ "Get" ],
       "SwaggerKey": "information"
     },
@@ -110,8 +123,47 @@
           "Port": 8080
         }
       ],
-      "UpstreamPathTemplate": "/api/pizzas/create",
+      "UpstreamPathTemplate": "/api/admin/pizzas/create",
       "UpstreamHttpMethod": [ "Post" ],
+      "SwaggerKey": "information"
+    },
+    {
+      "DownstreamPathTemplate": "/api/pizzas",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "pizzainformationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/admin/pizzas",
+      "UpstreamHttpMethod": [ "Get" ],
+      "SwaggerKey": "information"
+    },
+    {
+      "DownstreamPathTemplate": "/api/pizzas/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "pizzainformationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/admin/pizzas/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "SwaggerKey": "information"
+    },
+    {
+      "DownstreamPathTemplate": "/api/pizzas/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "pizzainformationservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/api/admin/pizzas/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
       "SwaggerKey": "information"
     }
   ],

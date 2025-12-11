@@ -94,7 +94,7 @@ services:
 
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: pizzaidentity-sqlserver
+    container_name: sqlserver
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=YourStrong@Passw0rd
@@ -140,6 +140,25 @@ services:
       - ASPNETCORE_URLS=http://+:8080
     depends_on:
       - gateway
+    restart: on-failure
+    networks:
+      - pizza-network
+
+  pizzainformationservice:
+    build:
+      context: ./PizzaInformationService
+      dockerfile: PizzaInformationService.Api/Dockerfile
+    container_name: pizzainformationservice
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+      - sql__HttpClientFactory=true
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=PizzaInformationDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true;MultipleActiveResultSets=true
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     restart: on-failure
     networks:
       - pizza-network

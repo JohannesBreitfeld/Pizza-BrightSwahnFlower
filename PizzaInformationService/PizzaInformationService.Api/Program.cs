@@ -31,6 +31,8 @@ var app = builder.Build();
 app.MapPizzaEndpoints();
 app.MapIngredientsEndpoints();
 app.MapCreatePizzaEndpoints();
+app.MapUpdatePizzaEndpoints();
+app.MapDeletePizzaEndpoints();
 
 if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
 {

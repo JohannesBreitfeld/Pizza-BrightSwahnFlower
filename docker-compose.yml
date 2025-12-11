@@ -39,6 +39,7 @@ services:
     depends_on:
       - orderservice
       - pizzainformationservice
+      - identity
     restart: on-failure
     networks:
       - pizza-network
@@ -87,7 +88,6 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=BreitSwahnFlower1!
-      - ConnectionStrings__DefaultConnection=Server=sql,1433;Database=PizzaInformationDb;User Id=SA;Password=BreitSwahnFlower1!;TrustServerCertificate=True
     volumes:
       - sql_data:/var/opt/mssql
     networks:
@@ -97,7 +97,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 30
-      start_period: 60s
+      start_period: 30s
     restart: 
       on-failure
 
@@ -156,6 +156,22 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+    networks:
+      - pizza-network
+
+  identity:
+    build:
+      context: ./PizzaIdentity
+      dockerfile: Identity.Api/Dockerfile
+    container_name: identity
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=sql,1433;Database=PizzaIdentity;User Id=sa;Password=BreitSwahnFlower1!;TrustServerCertificate=true;MultipleActiveResultSets=true
+    depends_on:
+      sql:
+        condition: service_healthy
+    restart: on-failure
     networks:
       - pizza-network
 

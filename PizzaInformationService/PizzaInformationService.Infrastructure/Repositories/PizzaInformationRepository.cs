@@ -31,5 +31,35 @@ namespace PizzaInformationService.Infrastructure.Repositories
         {
             return await _context.Pizzas.AsNoTracking().Include(p => p.Ingredients).FirstOrDefaultAsync(p => p.Id == id, ct);
         }
+
+        public async Task<Pizza?> UpdatePizzaAsync(int id, Pizza pizza, CancellationToken ct = default)
+        {
+            var existingPizza = await _context.Pizzas.Include(p => p.Ingredients).FirstOrDefaultAsync(p => p.Id == id, ct);
+
+            if (existingPizza == null)
+                return null;
+
+            existingPizza.Name = pizza.Name;
+            existingPizza.ImageUrl = pizza.ImageUrl;
+            existingPizza.Price = pizza.Price;
+            existingPizza.Ingredients = pizza.Ingredients;
+
+            await _context.SaveChangesAsync(ct);
+
+            return existingPizza;
+        }
+
+        public async Task<bool> DeletePizzaAsync(int id, CancellationToken ct = default)
+        {
+            var pizza = await _context.Pizzas.FirstOrDefaultAsync(p => p.Id == id, ct);
+
+            if (pizza == null)
+                return false;
+
+            _context.Pizzas.Remove(pizza);
+            await _context.SaveChangesAsync(ct);
+
+            return true;
+        }
     }
 }

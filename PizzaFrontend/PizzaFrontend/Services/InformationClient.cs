@@ -7,7 +7,7 @@ namespace PizzaFrontend.Services
     {
         public async Task<IEnumerable<PizzaDTO>> GetPizzasAsync()
         {
-            var pizzas = await client.GetFromJsonAsync<IEnumerable<PizzaDTO>>("pizzas");
+            var pizzas = await client.GetFromJsonAsync<IEnumerable<PizzaDTO>>("");
             return pizzas ?? Enumerable.Empty<PizzaDTO>();
         }
     }
