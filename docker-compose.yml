@@ -5,8 +5,27 @@ networks:
 volumes:
   cosmosdb_data:
   rabbitmq_data:
+  sql_data:
 
 services:
+  frontend:
+    build:
+      context: ./PizzaFrontend/PizzaFrontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - REACT_APP_API_GATEWAY_URL=http://gateway:8080
+      - GatewayUrl=http://gateway:8080
+      - ASPNETCORE_URLS=http://+:8080
+    depends_on:
+      - gateway
+    restart: on-failure
+    networks:
+      - pizza-network
+ 
   gateway:
     build:
       context: ./PizzaGateway/PizzaGateway
@@ -19,6 +38,7 @@ services:
       - ASPNETCORE_URLS=http://+:8080
     depends_on:
       - orderservice
+      - pizzainformationservice
     restart: on-failure
     networks:
       - pizza-network
@@ -40,6 +60,46 @@ services:
     restart: on-failure
     networks:
       - pizza-network
+
+  pizzainformationservice:
+    build:
+      context: ./PizzaInformationService
+      dockerfile: PizzaInformationService.Api/Dockerfile
+    container_name: pizzainformationservice
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+      - sql__HttpClientFactory=true
+    depends_on:
+      sql:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - pizza-network
+
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=BreitSwahnFlower1!
+      - ConnectionStrings__DefaultConnection=Server=sql,1433;Database=PizzaInformationDb;User Id=SA;Password=BreitSwahnFlower1!;TrustServerCertificate=True
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - pizza-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S tcp:localhost,1433 -U sa -P BreitSwahnFlower1! -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    restart: 
+      on-failure
 
   cosmosdb:
     image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
