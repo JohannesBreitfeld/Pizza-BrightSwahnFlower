@@ -16,7 +16,7 @@ public static class OrderEndpoints
             .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
             .ProducesValidationProblem();
 
-        app.MapGet("/api/orders/", HandleGetAllAsync)
+        app.MapGet("/api/orders", HandleGetAllAsync)
             .WithName("GetAllOrders")
             .WithTags("Orders")
             .Produces(StatusCodes.Status200OK);

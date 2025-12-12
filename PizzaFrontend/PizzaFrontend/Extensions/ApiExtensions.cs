@@ -20,23 +20,23 @@ namespace PizzaFrontend.Extensions
 
             services.AddHttpClient<IInformationClient, InformationClient>(client =>
             {
-                client.BaseAddress = new Uri($"{baseUrl}/api/information/");
+                client.BaseAddress = new Uri($"{baseUrl}/api/pizzas");
             });
 
             services.AddHttpClient<IOrderClient, OrderClient>(client =>
             {
-                client.BaseAddress = new Uri($"{baseUrl}/api/orders/");
+                client.BaseAddress = new Uri($"{baseUrl}/api/orders");
             });
 
             services.AddHttpClient<IAdminPizzaClient, AdminPizzaClient>(client =>
             {
-                client.BaseAddress = new Uri($"{baseUrl}/api/admin/information/");
+                client.BaseAddress = new Uri($"{baseUrl}/api/admin/pizzas");
             })
             .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
 
             services.AddHttpClient<IAdminOrderClient, AdminOrderClient>(client =>
             {
-                client.BaseAddress = new Uri($"{baseUrl}/api/admin/orders/");
+                client.BaseAddress = new Uri($"{baseUrl}/api/admin/orders");
             })
             .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
 

@@ -43,7 +43,7 @@
         </MudButton>
     </ToolBarContent>
     <Columns>
-        <PropertyColumn Property="x => x.OrderId" Title="Order ID" />
+        <PropertyColumn Property="x => x.Id" Title="Order ID" />
         <PropertyColumn Property="x => x.CustomerEmail" Title="Customer Email" />
         <PropertyColumn Property="x => x.Items.Count" Title="Items" Sortable="false" Filterable="false" />
         <TemplateColumn Title="Total Amount" Sortable="true" SortBy="@(x => x.TotalAmount)">
@@ -88,8 +88,8 @@
 
             if (response.IsSuccessStatusCode)
             {
-                var orders = await response.Content.ReadFromJsonAsync<List<OrderDTO>>();
-                _orders = orders ?? new List<OrderDTO>();
+                var result = await response.Content.ReadFromJsonAsync<GetAllOrdersResponse>();
+                _orders = result?.Orders ?? new List<OrderDTO>();
             }
             else
             {
@@ -112,7 +112,7 @@
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
 
-        if (x.OrderId.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (x.Id.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         if (x.CustomerEmail.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
