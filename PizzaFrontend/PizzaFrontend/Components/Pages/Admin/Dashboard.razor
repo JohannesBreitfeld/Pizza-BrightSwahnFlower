@@ -172,6 +172,7 @@ else
             }
 
             var ingredientsResponse = await PizzaClient.GetAllIngredientsAsync();
+            Console.WriteLine("Ingredeient response in dashboard:\n" + ingredientsResponse);
             if (ingredientsResponse.IsSuccessStatusCode)
             {
                 var ingredients = await ingredientsResponse.Content.ReadFromJsonAsync<List<IngredientDTO>>();

@@ -97,7 +97,7 @@
           "Port": 8080
         }
       ],
-      "UpstreamPathTemplate": "/api/admin/pizzas/ingredients",
+      "UpstreamPathTemplate": "/api/admin/ingredients",
       "UpstreamHttpMethod": [ "Get" ],
       "SwaggerKey": "information"
     },
