@@ -110,7 +110,7 @@
           "Port": 8080
         }
       ],
-      "UpstreamPathTemplate": "/api/admin/pizzas/create",
+      "UpstreamPathTemplate": "/api/admin/pizzas",
       "UpstreamHttpMethod": [ "Post" ],
       "SwaggerKey": "information"
     },

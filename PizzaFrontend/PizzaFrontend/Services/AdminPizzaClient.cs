@@ -17,7 +17,7 @@ public class AdminPizzaClient(HttpClient client) : IAdminPizzaClient
 
     public async Task<HttpResponseMessage> CreatePizzaAsync(CreatePizzaRequest request)
     {
-        return await client.PostAsJsonAsync("create", request);
+        return await client.PostAsJsonAsync("", request);
     }
 
     public async Task<HttpResponseMessage> UpdatePizzaAsync(int id, UpdatePizzaRequest request)

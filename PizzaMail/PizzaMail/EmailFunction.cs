@@ -50,7 +50,7 @@ namespace PizzaMail
                     from = new { email = _configuration["MAILERSEND_FROM_EMAIL"] },
                     to = new[] { new { email = orderCreatedEvent.Data.CustomerEmail } },
                     subject = "Order confirmation",
-                    text = $"We got your order for {orderItemsWithQuantity}.\nTotal number of items: {totalNumberOfItems}\nSum: {orderTotal.ToString("C", CultureInfo.GetCultureInfo("sv-SE"))}"
+                    text = $"We got your order for {orderItemsWithQuantity}.\nTotal number of items: {totalNumberOfItems}\nSum: {orderTotal.ToString("C", CultureInfo.GetCultureInfo("en-AU"))}"
                 };
 
                 _logger.LogInformation($"Attempting to send email for order {orderCreatedEvent.Data.OrderId} to {orderCreatedEvent.Data.CustomerEmail}", orderCreatedEvent.Data.OrderId);

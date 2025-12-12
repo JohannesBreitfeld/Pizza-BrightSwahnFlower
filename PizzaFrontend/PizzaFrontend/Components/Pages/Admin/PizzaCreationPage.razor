@@ -56,9 +56,10 @@
                 </MudPaper>
             } else
             {
+
                 <div style="width:100%; height:@($"{_pizzaHeight}px"); position:relative;">
-                    <MudImage Src="@context.ImagePath"
-                              Style="position:absolute; top:52%; left:50%; height:100%; width:auto; transform:translate(-50%,-50%); object-fit:contain;" />
+                    <img src="@context.ImagePath"
+                              style="position:absolute; top:52%; z-index:@(context.zIndex); left:50%; height:100%; width:auto; transform:translate(-50%,-50%); object-fit:contain;" />
                 </div>
             }
          </ItemRenderer>
@@ -164,6 +165,7 @@
         {
             var response = await AdminPizzaClient.CreatePizzaAsync(createPizzaRequest);
 
+            Console.WriteLine(response);
             if (response.IsSuccessStatusCode)
             {
                 Snackbar.Add($"Created pizza: {createPizzaRequest.Name}");

@@ -25,7 +25,7 @@
     </MudGrid>
 } else 
 {
-    <MudGrid Style="padding: 10px;">
+    <MudGrid Style="padding: 10px 10px 100px 10px;">
         @foreach (var pizza in _pizzas)
         {
             <MudItem xs="4">
@@ -35,7 +35,7 @@
                         <MudCardContent>
                             <MudText Typo="Typo.h5">@pizza.Name</MudText>
                             <MudText Typo="Typo.body2">@($"Toppings: {string.Join(", ", @pizza.Ingredients.Select(i => i.Name))}")</MudText>
-                            <MudText Typo="Typo.body2">@pizza.Price.ToString("C", CultureInfo.GetCultureInfo("sv-SE"))</MudText>
+                            <MudText Typo="Typo.body2">@pizza.Price.ToString("C", CultureInfo.GetCultureInfo("en-AU"))</MudText>
                         </MudCardContent>
                         <MudCardActions>
                             <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="() => SelectPizza(pizza)">
@@ -46,21 +46,22 @@
                 </MudCard>
             </MudItem>
         }
+
     </MudGrid>
 }
+    <MudAppBar Bottom="true" Fixed="true" Color="Color.Primary" Elevation="1">
+        <MudGrid Justify="Justify.SpaceAround">
+            <MudItem xs="6">
+                <MudTextField T="string" Label="Email" Variant="Variant.Outlined" @bind-Text="_email" Immediate="true">
+
+                </MudTextField>
+            </MudItem>
+            <MudItem xs="3">
+                <MudButton Disabled="_orderButtonIsDisabled" Style="margin-top: 15px;" Color="Color.Secondary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachMoney"
+                @onclick="() => PlaceOrderAsync()">Order</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudAppBar>
 
 
-<MudAppBar Bottom="true" Fixed="true" Color="Color.Primary" Elevation="1">
-    <MudGrid Justify="Justify.SpaceAround">
-        <MudItem xs="6">
-            <MudTextField T="string" Label="Email" Variant="Variant.Outlined" @bind-Text="_email" Immediate="true">
-
-            </MudTextField>
-        </MudItem>
-        <MudItem xs="3">
-            <MudButton Disabled="_orderButtonIsDisabled" Style="margin-top: 15px;" Color="Color.Secondary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachMoney"
-            @onclick="() => PlaceOrderAsync()">Order</MudButton>
-        </MudItem>
-    </MudGrid>
-</MudAppBar>
     

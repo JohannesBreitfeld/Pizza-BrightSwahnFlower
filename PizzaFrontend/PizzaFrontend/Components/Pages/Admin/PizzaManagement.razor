@@ -49,7 +49,7 @@
         <PropertyColumn Property="x => x.Name" Title="Name" />
         <TemplateColumn Title="Price" Sortable="true" SortBy="@(x => x.Price)">
             <CellTemplate>
-                @context.Item.Price.ToString("C", CultureInfo.GetCultureInfo("sv-SE"))
+                @context.Item.Price.ToString("C", CultureInfo.GetCultureInfo("en-AU"))
             </CellTemplate>
         </TemplateColumn>
         <TemplateColumn Title="Ingredients" Sortable="false" Filterable="false">

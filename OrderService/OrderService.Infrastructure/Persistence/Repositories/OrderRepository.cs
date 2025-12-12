@@ -25,7 +25,7 @@ public class OrderRepository : IOrderRepository
 
     public async Task<IEnumerable<Order>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var query = new QueryDefinition("SELECT * FROM c WHERE c.type = 'order'");
+        var query = new QueryDefinition("SELECT * FROM c WHERE c.type = 'Order'");
         var iterator = _container.GetItemQueryIterator<Order>(query);
         var results = new List<Order>();
 
@@ -41,7 +41,7 @@ public class OrderRepository : IOrderRepository
     public async Task<IEnumerable<Order>> GetAllPagedAsync(int skip = 0, int take = 20, CancellationToken cancellationToken = default)
     {
         var query = new QueryDefinition(
-      "SELECT * FROM c WHERE c.type = 'order' OFFSET @skip LIMIT @take")
+      "SELECT * FROM c WHERE c.type = 'Order' OFFSET @skip LIMIT @take")
             .WithParameter("@skip", skip)
             .WithParameter("@take", take);
         var iterator = _container.GetItemQueryIterator<Order>(query);
