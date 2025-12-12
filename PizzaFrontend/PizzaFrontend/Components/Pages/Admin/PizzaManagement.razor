@@ -33,13 +33,6 @@
                       Class="mt-0"
                       Immediate="true" />
         <MudButton Variant="Variant.Filled"
-                   Color="Color.Success"
-                   StartIcon="@Icons.Material.Filled.Add"
-                   OnClick="OpenCreateDialog"
-                   Class="ml-2">
-            Add Pizza
-        </MudButton>
-        <MudButton Variant="Variant.Filled"
                    Color="Color.Primary"
                    StartIcon="@Icons.Material.Filled.Refresh"
                    OnClick="LoadPizzas"
@@ -66,10 +59,6 @@
         </TemplateColumn>
         <TemplateColumn Title="Actions" Sortable="false" Filterable="false">
             <CellTemplate>
-                <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                               Size="Size.Small"
-                               Color="Color.Primary"
-                               OnClick="@(() => OpenEditDialog(context.Item))" />
                 <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                Size="Size.Small"
                                Color="Color.Error"
@@ -135,42 +124,6 @@
 
         return false;
     };
-
-    private async Task OpenCreateDialog()
-    {
-        var parameters = new DialogParameters<PizzaEditDialog>
-        {
-            { x => x.OnSaveCompleted, EventCallback.Factory.Create<bool>(this, HandleDialogSave) }
-        };
-
-        var options = new DialogOptions
-        {
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true,
-            CloseButton = true
-        };
-
-        await DialogService.ShowAsync<PizzaEditDialog>("Add New Pizza", parameters, options);
-    }
-
-    private async Task OpenEditDialog(PizzaDTO pizza)
-    {
-        var parameters = new DialogParameters<PizzaEditDialog>
-        {
-            { x => x.PizzaId, pizza.Id },
-            { x => x.IsEditMode, true },
-            { x => x.OnSaveCompleted, EventCallback.Factory.Create<bool>(this, HandleDialogSave) }
-        };
-
-        var options = new DialogOptions
-        {
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true,
-            CloseButton = true
-        };
-
-        await DialogService.ShowAsync<PizzaEditDialog>("Edit Pizza", parameters, options);
-    }
 
     private async Task HandleDialogSave(bool saved)
     {

@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="PizzaFrontend.Tests/PizzaFrontend.Tests.csproj" Id="fe2cc32f-d75d-402c-9ec6-9dc83af3079d" />
   <Project Path="PizzaFrontend/PizzaFrontend.csproj" />
 </Solution>

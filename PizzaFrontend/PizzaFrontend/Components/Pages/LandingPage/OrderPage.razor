@@ -4,9 +4,6 @@
 @using PizzaFrontend.Contracts.Pizzas
 @using System.Globalization
 @using PizzaFrontend.Interfaces
-@inject IInformationClient InformationApi
-@inject IOrderClient OrderApi
-@inject ISnackbar Snackbar
 @rendermode InteractiveServer
 
 
@@ -67,86 +64,3 @@
     </MudGrid>
 </MudAppBar>
     
-
-    @code{
-    private Pizza? _selectedPizza;
-    private bool _isLoading = true;
-    private string _email = string.Empty;
-    private bool _orderButtonIsDisabled => _selectedPizza is null || string.IsNullOrEmpty(_email);
-    private List<Pizza> _pizzas = [];
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            try
-            {
-                var pizzaDTOs = await InformationApi.GetPizzasAsync();
-
-                _pizzas = pizzaDTOs.Select(dto => new Pizza
-                {
-                    Id = dto.Id,
-                    Name = dto.Name,
-                    Price = dto.Price,
-                    Ingredients = dto.Ingredients.Select(i => new Ingredient
-                    {
-                        Id = i.Id,
-                        Name = i.Name
-                    }).ToList(),
-                    ImageUrl = dto.ImageUrl
-                }).ToList();
-            }
-            catch
-            {
-                Snackbar.Add("Couldn't retrieve pizzas, no connection to server", Severity.Error);
-            }
-
-            _isLoading = false;
-            StateHasChanged(); 
-        }
-    }
-
-    private void SelectPizza(Pizza pizza)
-    {
-        if(_selectedPizza is not null)
-        {
-            _selectedPizza.IsSelected = false;
-        }
-
-        pizza.IsSelected = true;
-        _selectedPizza = pizza;
-        StateHasChanged();
-    }
-
-    private async Task PlaceOrderAsync()
-    {
-        var pizzas = new List<OrderItemDTO>() 
-        {
-            new OrderItemDTO(_selectedPizza!.Id.ToString(), _selectedPizza.Name, 1, _selectedPizza.Price)
-        };
-        var request = new CreateOrderRequest(_email, pizzas);
-
-        try
-        {
-            var result = await OrderApi.PlaceOrderAsync(request);
-
-            if(result.IsSuccessStatusCode)
-            {
-                var orderResponse = await result.Content.ReadFromJsonAsync<CreateOrderResponse>();
-
-                if(orderResponse is not null)
-                {
-                    Snackbar.Add($"Order {orderResponse.OrderId} successful");
-                }
-            } else
-            {
-                Snackbar.Add("Order failed", Severity.Error);
-            }
-        }
-        catch (Exception e)
-        {
-            Snackbar.Add($"Order failed: {e.Message}", Severity.Error);
-        }
-
-    }
-}

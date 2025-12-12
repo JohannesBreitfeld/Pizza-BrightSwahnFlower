@@ -172,6 +172,7 @@ else
             }
 
             var ingredientsResponse = await PizzaClient.GetAllIngredientsAsync();
+            Console.WriteLine("Ingredeient response in dashboard:\n" + ingredientsResponse);
             if (ingredientsResponse.IsSuccessStatusCode)
             {
                 var ingredients = await ingredientsResponse.Content.ReadFromJsonAsync<List<IngredientDTO>>();
@@ -181,8 +182,8 @@ else
             var ordersResponse = await OrderClient.GetAllOrdersAsync(1, 100);
             if (ordersResponse.IsSuccessStatusCode)
             {
-                var orders = await ordersResponse.Content.ReadFromJsonAsync<List<OrderDTO>>();
-                _totalOrders = orders?.Count ?? 0;
+                var result = await ordersResponse.Content.ReadFromJsonAsync<GetAllOrdersResponse>();
+                _totalOrders = result?.Orders?.Count ?? 0;
             }
         }
         catch (Exception ex)

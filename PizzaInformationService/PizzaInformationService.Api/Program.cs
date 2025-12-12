@@ -28,9 +28,27 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Apply migrations automatically on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<PizzaInformationService.Infrastructure.Persistance.PizzaInformationDbContext>();
+    try
+    {
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database");
+        throw;
+    }
+}
+
 app.MapPizzaEndpoints();
 app.MapIngredientsEndpoints();
 app.MapCreatePizzaEndpoints();
+app.MapUpdatePizzaEndpoints();
+app.MapDeletePizzaEndpoints();
 
 if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
 {

@@ -13,7 +13,9 @@ namespace PizzaInformationService.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<PizzaInformationDbContext>(options =>
-                options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(config.GetConnectionString("DefaultConnection"))
+                    .ConfigureWarnings(warnings =>
+                        warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
             services.AddScoped<IPizzaInformationDbContext>(provider =>
                 provider.GetRequiredService<PizzaInformationDbContext>());

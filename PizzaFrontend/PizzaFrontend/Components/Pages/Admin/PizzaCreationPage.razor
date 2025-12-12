@@ -1,0 +1,181 @@
+﻿@page "/admin/pizza-creation"
+@layout PizzaFrontend.Components.Layout.AdminLayout
+@using PizzaFrontend.Contracts.Admin
+@using PizzaFrontend.Contracts.Pizzas
+@using PizzaFrontend.Interfaces
+@using PizzaFrontend.Models
+@using PizzaFrontend.Models.PizzaCreation
+@inject ISnackbar Snackbar
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@inject IAdminPizzaClient AdminPizzaClient
+
+<div style="height: calc(100vh - var(--mud-appbar-height) - 70px); display: flex; flex-direction: column; overflow: hidden;">
+    <MudDropContainer T="DropIngredient"
+                      Items="_items"
+                      ItemsSelector="@((item, dropzone) => item.Zone == dropzone)"
+                      ItemDropped="ItemUpdated"
+                      Style="height:100%"
+                      @ref="_container">
+        <ChildContent>
+            <MudGrid Style="height:100%; width:100%; display:flex; flex-direction:row; overflow:hidden;">
+                <MudItem xs="2" Style="display:flex; flex-direction:column; height:100%;">
+                    <MudText Style="flex:0 0 auto;" Typo="Typo.h6">Ingredients</MudText>
+                    <MudDropZone T="DropIngredient" Identifier="Ingredients" CanDrop="@((item) => true)"
+                                 Style="flex:1 1 auto; overflow:auto;">
+                    </MudDropZone>
+                </MudItem>
+                <div style="flex:1; display:flex;" @ref="_pizzaDropZoneDivRef">
+                    <MudItem xs="10" Style="display:flex; flex-direction:column; height:calc(100vh - var(--mud-appbar-height) - 70px);">
+                    <MudDropZone T="DropIngredient"
+                                 Identifier="Pizza"
+                                 CanDrop="@((item) => true)"
+                                 Style="flex:1;
+                                        display:flex;
+                                        justify-content:center;
+                                        align-items:center;
+                                        position:relative;
+                                        overflow:hidden;">
+
+                            <MudImage Src="Images/PizzaCreationImages/Dough.png"
+                                      Style="position:absolute; padding-top:2%; top:50%; left:50%; height:100%; width:auto; transform:translate(-50%,-50%); object-fit:contain;" />
+                    </MudDropZone>
+                </MudItem>
+                </div>
+            </MudGrid>
+
+
+            
+        </ChildContent>
+        <ItemRenderer> 
+            @if (context.Zone == "Ingredients") 
+            {
+                <MudText Typo="Typo.body2">@context.Ingredient.Name</MudText>
+                <MudPaper Height="50px" Width="50px">
+                    <MudImage Fluid="true" ObjectFit="ObjectFit.Fill" Src="@context.ImagePath" />
+                </MudPaper>
+            } else
+            {
+                <div style="width:100%; height:@($"{_pizzaHeight}px"); position:relative;">
+                    <MudImage Src="@context.ImagePath"
+                              Style="position:absolute; top:52%; left:50%; height:100%; width:auto; transform:translate(-50%,-50%); object-fit:contain;" />
+                </div>
+            }
+         </ItemRenderer>
+
+    </MudDropContainer>
+</div>
+<div style="height:100%; display:flex; align-items:center; justify-content:center;">
+    <div style="display:flex; flex-direction:row; gap:8px;">
+        <MudTextField T="string" Style="width:300px; flex:0 0 auto;"
+        @bind-Text="_pizzaName" Immediate="true"
+                      Label="Pizza name" />
+        <MudTextField T="string" Style="width:300px; flex:0 0 auto;"
+                      @bind-Text="_imageUrl" Immediate="true"
+                      Label="Image url" />
+        <MudTextField T="decimal" Style="width:300px; flex:0 0 auto;"
+                      @bind-value="_price" Immediate="true"
+                      Label="Price" />
+        <MudButton Style="flex:0 0 auto;" OnClick="Create">Create</MudButton>
+    </div>
+</div>
+
+@code {
+    private string _pizzaName = string.Empty;
+    private string _imageUrl = string.Empty;
+    private decimal _price = 0;
+    private MudDropContainer<DropIngredient> _container;
+    private ElementReference _pizzaDropZoneDivRef;
+    private double _pizzaHeight;
+    private List<DropIngredient> _items = [];
+    private Pizza _pizza = new()
+    {
+        Name = "New Pizza"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadIngredients();
+    }
+
+    private async Task LoadIngredients()
+    {
+        try
+        {
+            var response = await AdminPizzaClient.GetAllIngredientsAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                var ingredientDTOs = await response.Content.ReadFromJsonAsync<List<IngredientDTO>>();
+                _items = ingredientDTOs?.Select(i => new DropIngredient
+                {
+                    Zone = "Ingredients",
+                    Ingredient = new Ingredient
+                    {
+                        Id = i.Id,
+                        Name = i.Name
+                    }
+                }).ToList() ?? new List<DropIngredient>();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to load ingredients: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading ingredients: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("eval", @"
+                window.getElementHeight = (el) => {
+                    return el.offsetHeight;
+                };
+            ");
+
+            _pizzaHeight = await JS.InvokeAsync<double>("getElementHeight", _pizzaDropZoneDivRef);
+        }
+    }
+
+    private void ItemUpdated(MudItemDropInfo<DropIngredient> dropItem)
+    {
+        dropItem.Item.Zone = dropItem.DropzoneIdentifier;
+    }
+
+    private async Task Create()
+    {
+        var createPizzaRequest = new CreatePizzaRequest(
+        _pizzaName,
+        _price,
+        _imageUrl,
+        _items.Where(i => i.Zone == "Pizza").Select(i => i.Ingredient.Id).ToList()
+        );
+
+        try
+        {
+            var response = await AdminPizzaClient.CreatePizzaAsync(createPizzaRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add($"Created pizza: {createPizzaRequest.Name}");
+            } else
+            {
+                Snackbar.Add($"Failed to create pizza: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error while creating pizza: {ex.Message}", Severity.Error);
+
+        }
+    }
+}
