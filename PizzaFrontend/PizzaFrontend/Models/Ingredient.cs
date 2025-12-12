@@ -1,4 +1,4 @@
-﻿namespace PizzaFrontend.Contracts.Pizzas
+﻿namespace PizzaFrontend.Models
 {
     public class Ingredient
     {
