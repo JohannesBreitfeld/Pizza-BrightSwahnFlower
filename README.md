@@ -6,7 +6,7 @@ A microservices-based pizza ordering system built with .NET and Docker.
 
 The system consists of multiple microservices that communicate through an API Gateway and use message-based communication via RabbitMQ.
 
-```mermaid
+::: mermaid
 graph TB
     subgraph "Client Layer"
         Frontend[PizzaFrontend<br/>:5000]
@@ -70,7 +70,8 @@ graph TB
     class CosmosDB,SQLServer database
     class Redis cache
     class RabbitMQ broker
-```
+:::
+
 
 ### Services
 
