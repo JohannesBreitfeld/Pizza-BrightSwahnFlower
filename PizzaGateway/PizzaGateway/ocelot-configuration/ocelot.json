@@ -28,7 +28,14 @@
       "UpstreamHttpMethod": [
         "Get"
       ],
-      "SwaggerKey": "orders"
+      "SwaggerKey": "orders",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/auth/login",
@@ -99,7 +106,14 @@
       ],
       "UpstreamPathTemplate": "/api/admin/ingredients",
       "UpstreamHttpMethod": [ "Get" ],
-      "SwaggerKey": "information"
+      "SwaggerKey": "information",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/pizzas/create",
@@ -112,7 +126,14 @@
       ],
       "UpstreamPathTemplate": "/api/admin/pizzas",
       "UpstreamHttpMethod": [ "Post" ],
-      "SwaggerKey": "information"
+      "SwaggerKey": "information",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/pizzas",
@@ -125,7 +146,14 @@
       ],
       "UpstreamPathTemplate": "/api/admin/pizzas",
       "UpstreamHttpMethod": [ "Get" ],
-      "SwaggerKey": "information"
+      "SwaggerKey": "information",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/pizzas/{id}",
@@ -138,7 +166,14 @@
       ],
       "UpstreamPathTemplate": "/api/admin/pizzas/{id}",
       "UpstreamHttpMethod": [ "Get" ],
-      "SwaggerKey": "information"
+      "SwaggerKey": "information",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/pizzas/{id}",
@@ -151,7 +186,14 @@
       ],
       "UpstreamPathTemplate": "/api/admin/pizzas/{id}",
       "UpstreamHttpMethod": [ "Put" ],
-      "SwaggerKey": "information"
+      "SwaggerKey": "information",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/pizzas/{id}",
@@ -164,7 +206,14 @@
       ],
       "UpstreamPathTemplate": "/api/admin/pizzas/{id}",
       "UpstreamHttpMethod": [ "Delete" ],
-      "SwaggerKey": "information"
+      "SwaggerKey": "information",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "RouteClaimsRequirement": {
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin"
+      }
     }
   ],
   "SwaggerEndPoints": [
