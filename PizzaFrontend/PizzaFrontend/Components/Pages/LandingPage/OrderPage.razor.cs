@@ -27,32 +27,35 @@ namespace PizzaFrontend.Components.Pages.LandingPage
             StateHasChanged();
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnAfterRenderAsync(bool isFirstRender)
         {
-            try
+            if(isFirstRender)
             {
-                var pizzaDTOs = await InformationApi.GetPizzasAsync();
-
-                _pizzas = pizzaDTOs.Select(dto => new Pizza
+                try
                 {
-                    Id = dto.Id,
-                    Name = dto.Name,
-                    Price = dto.Price,
-                    Ingredients = dto.Ingredients.Select(i => new Ingredient
-                    {
-                        Id = i.Id,
-                        Name = i.Name
-                    }).ToList(),
-                    ImageUrl = dto.ImageUrl
-                }).ToList();
-            }
-            catch
-            {
-                Snackbar.Add("Couldn't retrieve pizzas, no connection to server", Severity.Error);
-            }
+                    var pizzaDTOs = await InformationApi.GetPizzasAsync();
 
-            _isLoading = false;
-            RefreshUI();
+                    _pizzas = pizzaDTOs.Select(dto => new Pizza
+                    {
+                        Id = dto.Id,
+                        Name = dto.Name,
+                        Price = dto.Price,
+                        Ingredients = dto.Ingredients.Select(i => new Ingredient
+                        {
+                            Id = i.Id,
+                            Name = i.Name
+                        }).ToList(),
+                        ImageUrl = dto.ImageUrl
+                    }).ToList();
+                }
+                catch
+                {
+                    Snackbar.Add("Couldn't retrieve pizzas, no connection to server", Severity.Error);
+                }
+
+                _isLoading = false;
+                RefreshUI();
+            }
         }
 
         public void SelectPizza(Pizza pizza)
