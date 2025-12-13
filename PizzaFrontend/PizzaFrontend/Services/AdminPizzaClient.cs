@@ -27,7 +27,7 @@ public class AdminPizzaClient(HttpClient client) : IAdminPizzaClient
 
     public async Task<HttpResponseMessage> DeletePizzaAsync(int id)
     {
-        return await client.DeleteAsync($"{id}");
+        return await client.DeleteAsync($"pizzas/{id}");
     }
 
     public async Task<HttpResponseMessage> GetAllIngredientsAsync()
