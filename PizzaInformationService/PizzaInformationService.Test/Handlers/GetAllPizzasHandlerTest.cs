@@ -1,4 +1,5 @@
 ﻿using Moq;
+using PizzaInformationService.Application.Abstractions;
 using PizzaInformationService.Application.Pizza.GetAllPizzas;
 using PizzaInformationService.Domain.Entities;
 using PizzaInformationService.Domain.Interfaces;
@@ -12,13 +13,14 @@ namespace PizzaInformationService.Test.Handlers
         {
             // Arrange
             var mockRepository = new Mock<IPizzaInformationRepository>();
+            var mockCacheService = new Mock<ICacheService>();
             mockRepository.Setup(repo => repo.GetAllPizzaAsync(It.IsAny<CancellationToken>()))
                           .ReturnsAsync(new List<Pizza>
                           {
                               new Pizza { Id = 1, Name = "Margherita", ImageUrl="test" },
                               new Pizza { Id = 2, Name = "Pepperoni", ImageUrl="test" }
                           });
-            var handler = new GetAllPizzasHandler(mockRepository.Object);
+            var handler = new GetAllPizzasHandler(mockRepository.Object, mockCacheService.Object);
             var request = new GetAllPizzasQuery();
             // Act
             var result = await handler.Handle(request, CancellationToken.None);
@@ -31,7 +33,8 @@ namespace PizzaInformationService.Test.Handlers
         {
             // Arrange
             var mockRepository = new Mock<IPizzaInformationRepository>();
-            var handler = new GetAllPizzasHandler(mockRepository.Object);
+            var mockCacheService = new Mock<ICacheService>();
+            var handler = new GetAllPizzasHandler(mockRepository.Object, mockCacheService.Object);
             var request = new GetAllPizzasQuery();
             // Act
             await handler.Handle(request, CancellationToken.None);

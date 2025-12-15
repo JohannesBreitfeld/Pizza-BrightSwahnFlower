@@ -19,7 +19,11 @@ namespace PizzaInformationService.Api.Endpoints.Pizza
                 }
                 catch(Exception ex)
                 {
-                    return Results.BadRequest(new { error = ex.Message });
+                    if (ex.InnerException is ArgumentException argEx)
+                    {
+                        return Results.BadRequest(new { error = argEx.Message });
+                    }
+                    return Results.Problem(ex.Message);
                 }
             })
             .WithName("CreatePizza");
