@@ -60,7 +60,11 @@ if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docke
     });
 }
 
-app.UseHttpsRedirection();
+if (!builder.Environment.IsEnvironment("Docker"))
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseExceptionHandler();
 app.UseAuthorization();
 

@@ -5,6 +5,7 @@ networks:
 volumes:
   cosmosdb_data:
   rabbitmq_data:
+  redis_data:
   sqlserver_data:
 
 services:
@@ -77,6 +78,8 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: on-failure
     networks:
       - pizza-network
@@ -122,6 +125,21 @@ services:
       retries: 30
       start_period: 60s
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --requirepass
+      - 'BreitSwahnFlower1!'
+    networks:
+      - pizza-network
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
@@ -153,6 +171,8 @@ services:
       - MAILERSEND_FROM_EMAIL=pizza@test-zxk54v8vozpljy6v.mlsender.net
     depends_on:
       rabbitmq:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
     networks:
       - pizza-network

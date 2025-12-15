@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PizzaInformationService.Application.Abstractions;
 using PizzaInformationService.Domain.Interfaces;
+using PizzaInformationService.Infrastructure.Caching;
 using PizzaInformationService.Infrastructure.Persistance;
 using PizzaInformationService.Infrastructure.Repositories;
 
@@ -17,11 +18,18 @@ namespace PizzaInformationService.Infrastructure
                     .ConfigureWarnings(warnings =>
                         warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning)));
 
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = config.GetConnectionString("Redis");
+            });
+
             services.AddScoped<IPizzaInformationDbContext>(provider =>
                 provider.GetRequiredService<PizzaInformationDbContext>());
 
             services.AddScoped<IPizzaInformationRepository, PizzaInformationRepository>();
             services.AddScoped<IIngredientsRepository, IngredientsRepository>();
+            services.AddScoped<ICacheService, RedisCacheService>();
+            services.AddScoped<ICacheInvalidationService, CacheInvalidationService>();
 
             return services;
         }
